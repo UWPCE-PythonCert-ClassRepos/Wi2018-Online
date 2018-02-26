@@ -1,8 +1,8 @@
-data = [('John Smith', [400]),
-        ('Bill Wilmer', [8000, 10000, 3000]),
-        ('George Guy', [50]),
-        ('Elizabeth Jones', [2000, 1000, 2000]),
-        ('Nathan Star', [250.50, 100])]
+data = {'John Smith': [400],
+        'Bill Wilmer': [8000, 10000, 3000],
+        'George Guy': [50],
+        'Elizabeth Jones': [2000, 1000, 2000],
+        'Nathan Star': [250.50, 100]}
 
 
 def menu():
@@ -12,50 +12,49 @@ def menu():
     return int(input())
 
 
-def people():
-    ''' Creates a list of donor names '''
-    names = []
-    for person in data:
-        names.append(person[0])
-    return names
-
-
 def thank_you():
     '''
     Sends a Thank You: Asks for a full name, Lists the donors, Asks for donation amount,
     Converts the donation to an integer, Adds donation amount to associated donor in list
     '''
-    people_list = people()
     while True:
-        input_name = input("Please enter a Full Name or type 'list' to see a list of donors: ")
-        if input_name == 'list':
-            print(("{}\n" * len(people_list)).format(*people_list))
-        if input_name not in people_list:
-            data.append((input_name, []))
-        break
-    donation = input("Enter a donation amount for {} : ".format(input_name))
-    for person in data:
-        if input_name in person[0]:
-            person[1].append(float(donation))
+        input_key = input("Please enter a Full Name or type 'list' to see a list of donors: ")
+        if input_key == 'list':
+            print("\nHere is a list of the current donors:\n")
+            for key, val in data.items():
+                print(f"{key:20} $  {val}")
+
+        elif input_key in data.keys():
+            input_value = float(input("Enter a donation amount for {} : ".format(input_key)))
+            data[input_key].append(input_value)
             print("\nDear {},\n\nThank You for the generous donation of ${}."
-                  "\n\nThe Donation Center :^)".format(input_name, donation))
+                  "\n\nThe Donation Center :^)".format(input_key, input_value))
+
+        elif input_key not in data.keys():
+            input_value = float(input("Enter a donation amount for {} : ".format(input_key)))
+            data[input_key] = [input_value]
+            print("\nDear {},\n\nThank You for the generous donation of ${}."
+                  "\n\nThe Donation Center :^)".format(input_key, input_value))
+
+        break
 
 
 def report():
     """ Prints a report with the Donor Name, Total Given, Number of Gifts, and Average Gift. """
     print("Donor Name                | Total Given | Num Gifts | Average Gift")
     print("------------------------------------------------------------------")
-    for person in data:
-        print(f"{person[0]:25} $ {sum(person[1]):>12.2f}  {len(person[1]):>8}  $ {sum(person[1])/len(person[1]):>11.2f}")
+    for key, val in data.items():
+        print(f"{key:25} $ {float(sum(val)):>12.2f}  {len(val):>8}  $ {float(sum(val))/len(val):>11.2f}")
 
 
 def letters():
-    for item in data:
-        file = open('{}.txt'.format(item[0]), 'w')
-        with open('{}.txt'.format(item[0]), 'w') as f:
+    for key, val in data.items():
+        file = open('{}.txt'.format(key), 'w')
+        with open('{}.txt'.format(key), 'w') as f:
             f.write("Dear {},\n\nThank You for donating a total of ${}. We look forward to hearing from you again."
-                "\n\nThe Donation Center ;^)".format(item[0], sum(item[1])))
+                    "\n\nThe Donation Center ;^)".format(key, sum(val)))
         file.close()
+    print("\n*** Text files have been created ***\n")
 
 
 if __name__ == "__main__":
