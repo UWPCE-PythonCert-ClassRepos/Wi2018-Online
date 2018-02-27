@@ -10,8 +10,8 @@ print(dict1)
 dict1["fruit"] = "Mango"
 dict1.keys()
 dict1.values()
-print("Is ""cake"" a key of dict1? ","cake" in dict1.keys())
-print("Is ""Mango"" a value of dict1? ","Mango" in dict1.values())
+print("Is ""cake"" a key of dict1? ", "cake" in dict1.keys())
+print("Is ""Mango"" a value of dict1? ", "Mango" in dict1.values())
 
 print("\n============ Dictionaries 2 ============")
 dict2 = {"name": "Chris", "city": "Seattle", "cake": "Chocolate"}
@@ -22,19 +22,19 @@ for key in dict2.keys():
 print("Dict2 with values = # of ""t""s", dict2)
 
 print("\n============ Sets 1 ============")
-s1 = set(range(1,20+1))
+s1 = set(range(1, 20 + 1))
 s2 = s1.copy()
 s3 = s1.copy()
 s4 = s1.copy()
 # loop through s1 starting from 1 to last
-for index in range(1,len(s1)+1):
+for index in range(1, len(s1) + 1):
     if index % 2 == 0:
         s2.remove(index)
     if index % 3 == 0:
         s3.remove(index)
     if index % 4 == 0:
         s4.remove(index)
-print("s1: ",s1, "\ns2: ",s2,"\ns3: ",s3,"\ns4: ",s4)
+print("s1: ", s1, "\ns2: ", s2, "\ns3: ", s3, "\ns4: ", s4)
 print("Is s3 a subset of s2? ", s2.issubset(s3))
 print("Is s4 a subset of s2? ", s2.issubset(s4))
 
@@ -43,13 +43,14 @@ print("\n============ Sets 2 ============")
 set1 = set(list("Python"))
 set1.add("i")
 set2 = frozenset(tuple(list("marathon")))
-print("Set1: ", set1,"\nSet2: ", set2)
+print("Set1: ", set1, "\nSet2: ", set2)
 print("Union of set1 & set2 is: ", set1.union(set2))
 print("Intersection of set1 & set2 is: ", set1.intersection(set2))
 
 print("\n============ File Lab ============")
 # print full path of all files in cd
 import os
+
 list_of_files = os.listdir()
 for n in range(len(list_of_files)):
     print("{}".format(os.path.abspath(list_of_files[n])))
@@ -63,30 +64,7 @@ with open("pic.jpg", "rb") as f1:
             # if the end of the file has been reached f1.read() will return ""
             if char:
                 f2.write(char)
-            else: break
+            else:
+                break
         f1.close()
         f2.close()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

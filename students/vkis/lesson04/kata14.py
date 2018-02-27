@@ -97,23 +97,9 @@ def f_input():
         file.close
 
         
-def f_export():
-    # open path to new file
-    # print first key and value
-    # loop through key and see if there is a match
-    # create holders for each word loaded so it can be matched easier
-    # write it to file
-    
+def f_export():    
     with open("kata14_out.txt", "w") as out:
-        dict2 = dict.copy()
-        
-        
-        # pull out the same 3 word start from the dict
-        # start_str = list(dict.items())[0][0] + " " + list(dict.items())[0][1][0]
-        # start_list = start_str.split()
-        #word1 = start_list[0]
-        #word2 = start_list[1]
-        
+        dict2 = dict.copy()        
         
         # User input format
         while True:
