@@ -51,16 +51,19 @@ def send_to_screen():
 
 def send_to_file():
     target_folder = '~/Downloads/'
+    file_names = []
     now = datetime.datetime.now()
     file_append = now.strftime("%Y-%m-%d")
     for k, v in d.items():
         # w+ will create file and write
         f = open(os.path.expanduser(target_folder + k + file_append + '.txt'), "w+")
+        file_names.append(f.name)
         f.write(f"Dear {k}, thanks\n\n"
                 f"Your donation of ${'{:,}'.format(sum(v))} is appreciated\n\n"
                  "It will be put to good use.\n\n"
                  "THANKS")
         f.close()
+    return file_names
 
 
 #####################
@@ -103,12 +106,15 @@ def send_thank_you():
 
 def create_report():
     heading = "Donor Name | Total Given | Num Gifts | Average Gift\n"
-    print(heading + seperator(heading))
+    heading += seperator(heading)
+    # print(heading + seperator(heading))
+    result = ''
     for k, v in d.items():
-        print("{:10} ${:10.2f} {:10} {:15.2f}".format(k,
+        result += "{:10} ${:10.2f} {:10} {:15.2f}\n".format(k,
                                                       sum(v),
                                                       len(v),
-                                                      (sum(v) / len(v))))
+                                                      (sum(v) / len(v)))
+    print(heading + "\n" + result)
 
 
 def quit():
