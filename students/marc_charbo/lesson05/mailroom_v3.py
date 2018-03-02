@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 import logging
 import logging.config
 
@@ -23,6 +24,8 @@ def send_letter():
         file.write('\t\t\t\t-The Team')
         file.close()
 
+    logging.info('Saved letter on disk')
+
 def quit():
     print('Existing program\n')
     return 'quit'
@@ -39,13 +42,14 @@ def create_report():
         print('{:25} ${:^15.2f} {:^15d} ${:^15.2f}'.format(key,sum(value),len(value),sum(value)/len(value)))
 
     print('-- End Report --\n')
+    logging.info('On screen print report')
 
 def send_email(selection,amount):
     """ sends thank you email to donor with their name and donation amount"""
     print('-- Sending Email --\n')
     print ('Thank you {} for you generous ${:.2f} donation'.format(selection,amount))
     print('-- Email Sent --\n')
-
+    logging.info('Sending Email')
 
 def send_thank_you():
     """ donnor dict handling function"""
@@ -61,10 +65,16 @@ def send_thank_you():
             DONOR_LIST[selection] = []
             print('{} was added to the database'.format(selection))
 
-        amount = input('Please enter a donation amount: ')
-        amount = float(amount)
-        DONOR_LIST[selection].append(amount)
-        send_email(selection,amount)
+        try:
+            amount = input('Please enter a donation amount: ')
+            amount = float(amount)
+            DONOR_LIST[selection].append(amount)
+            send_email(selection,amount)
+        except ValueError as e:
+            print('error with task running program\n {}'.format(e))
+            print('Returning to main menu\n')
+            logging.debug('error with task running program\n {}'.format(e))
+            return
 
 def prompt_user():
     """ function which displays main menu and prompts user to enter selection"""
@@ -87,12 +97,14 @@ def run():
             if dispatch_dict[prompt_user()]() == 'quit':
                 break
         except KeyError as e:
-            print('{e} select not available please chose between menu options\n'.format(e))
+            print('{} select not available please chose between menu options\n'.format(e))
             continue
+        except ValueError as e:
+            print('{} select not available please chose between menu options\n'.format(e))
+
 
 def main():
     try:
-        logging.basicConfig(filename='myapp.log', level=logging.INFO)
         logging.info('Started Mailroom Program')
         run()
     except Exception as e:

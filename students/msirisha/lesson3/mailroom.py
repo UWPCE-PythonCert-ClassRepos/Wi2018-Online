@@ -43,9 +43,9 @@ def send_a_thankyou():
         if donor[0] == choice:
             donor[1].append(amount)
 
-    print("Hi {}\n".format(choice))
-    print("\nThank you for your generous donation {}".format(sum(donor_data[-1][1])))
-    print("\nSincerly,\nLocal Charity")
+            print("Hi {}\n".format(choice))
+            print("\nThank you for your generous donation {}".format(amount))
+            print("\nSincerly,\nLocal Charity")
 
 
 def create_a_report():

@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 # -----------------------------------------------------------
 # mailroom.py
-#  Part 3. Script to automate writing thank you emails to donors.
-#  Add exceptions and use comprehensions.
+#  Script to automate writing thank you emails to donors.
 # -----------------------------------------------------------
 
 import time
@@ -72,8 +71,6 @@ Dear {first_name} {last_name},
     amount = donor_data[donor][-1]
     return format_string.format(last_donation=float(amount), first_name=donor.first, last_name=donor.last)
 
-#    return "{first_name} {last_name} {donations[2]}".format(**(donor_data[donor]))  # This requires static index!!
-
 
 def send_letters_all():
     """
@@ -91,6 +88,27 @@ def send_letters_all():
     return None
 
 
+def get_donor(fullname):
+    '''
+    Given a text string with a donor's full name, determines if it is in data, new, or invalid.
+    If new, creates new donor entry in donor_data, with an empty donation list.
+    :param fullname: string, full name of a donor
+    :return: Donor object, or None
+    '''
+    name_sp = fullname.split()
+    if len(name_sp) == 0:
+        return None
+    elif len(name_sp) > 1:
+        donor = Donor(name_sp[0], ' '.join(name_sp[1:]))  # Defines first name up to the first space given
+    else:
+        donor = Donor(first='', last=name_sp[0])
+
+    if donor not in donor_data:
+        donor_data[donor] = []
+
+    return donor
+
+
 def send_thank_you():
     """
     Prompts for donor name, if not present, adds user to data. Prompts for donation
@@ -106,18 +124,12 @@ def send_thank_you():
             print(("{}\n" * len(donor_data)).format(*([get_donor_fullname(d) for d in donor_data])))
             continue
         else:
-            name_sp = name.split()
-            if len(name_sp) == 0:
+            donor = get_donor(name)
+            if not donor:
                 print("Name cannot be empty.")
                 continue
-            elif len(name_sp) > 1:
-                donor = Donor(name_sp[0], ' '.join(name_sp[1:]))  # Defines first name up to the first space given
             else:
-                donor = Donor(first='', last=name)
-            break
-
-    if donor not in donor_data:
-        donor_data[donor] = []
+                break
 
     while True:
         try:
