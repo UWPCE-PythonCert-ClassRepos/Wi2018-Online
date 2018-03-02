@@ -6,7 +6,7 @@ import random
 donor_names = frozenset(("Daniel Ocean", "Rusty Ryan", "Linus Caldwell", "Ruben Tishkoff", "Basher Tarr"))
 
 # create donors with dict comprehension 
-donors = {donor: random.sample(range(1, 50000), random.randint(1, 5)) for donor in donor_names}
+donors = {donor: [1000, 2000] for donor in donor_names}
 
 # define a function to prompt the user for their desired action
 def prompt_user():
@@ -26,10 +26,6 @@ def prompt_user():
             continue
         else:
             return response
-
-# define a testable function to handle the received input of prompt_user()
-
-
 
 # define a function to send a thank you card
 def send_a_thank_you():
