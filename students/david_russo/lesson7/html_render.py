@@ -22,13 +22,21 @@ class Element():
 			self.content.append(content)
 
 	def append(self, extra_content):
-		self.content.append(extra_content)
+		if hasattr(extra_content, 'render'):
+			self.content.append(extra_content)
+		else:
+			self.content.append(TextWrapper(str(extra_content)))
 
 	def render(self, file_out, cur_ind = ""):
-		file_out.write('<{}>\n'.format(self.tag))
+		file_out.write("<{}>\n".format(self.tag))
 		for stuff in self.content:
-			file_out.write(cur_ind + self.indentation + stuff + '\n')
-		file_out.write('<\{}>'.format(self.tag))
+			try:
+				stuff.render(file_out, cur_ind + self.indentation)
+				file_out.write("\n")
+			except AttributeError:
+			    file_out.write(cur_ind + self.indentation + stuff)
+			    file_out.write("\n")
+		file_out.write("<\{}>".format(self.tag))
 
 
 
@@ -49,6 +57,13 @@ class P(Element):
 	Subclass of Element class, specifically for element of type 'p'
 	"""
 	tag = "p"
+
+class Head(Element):
+	"""
+	Subclass of Element class, specifically for element of type 'head'
+	"""
+	tag = "head"
+
 
 
 
