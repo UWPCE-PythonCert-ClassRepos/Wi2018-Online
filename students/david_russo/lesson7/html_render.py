@@ -29,12 +29,14 @@ class Element():
 			self.content.append(TextWrapper(str(extra_content)))
 
 	def render(self, file_out, cur_ind = ""):
-		file_out.write("<{}".format(self.tag))
+		file_out.write("{}<{}".format(cur_ind, self.tag))
 
 		for key, value in self.attributes.items():
 			file_out.write(' {}="{}"'.format(key, value))
 
-		file_out.write(">")
+		file_out.write(">\n")
+
+		cur_ind = cur_ind + self.indentation
 
 		for stuff in self.content:
 			try:
@@ -52,6 +54,11 @@ class Html(Element):
 	Subclass of Element class, specifically for elements of type 'HTML'
 	"""
 	tag = "html"
+
+	def render(self, file_out, cur_ind = ""):
+		file_out.write("<!DOCTYPE {}>\n".format(self.tag))
+		Element.render(self, file_out, cur_ind = "")
+
 
 class Body(Element):
 	"""
@@ -94,6 +101,7 @@ class SelfClosingTag(Element):
 	Subclass of Element class, with a render method just for the tag and attributes
 	"""
 	def render(self, file_out, cur_ind = ""):
+
 		file_out.write("<{}".format(self.tag))
 
 		for key, value in self.attributes.items():
@@ -141,6 +149,17 @@ class H(OneLineTag):
 	def __init__(self, level, content = None, **kwargs):
 		self.tag = "h" + str(level)
 		Element.__init__(self, content, **kwargs)
+
+class Meta(SelfClosingTag):
+	"""
+	Subclass of class SelfClosingTag, designed to insert metadata into the html header
+	"""
+	tag = "meta"
+
+
+
+
+
 
 
 
