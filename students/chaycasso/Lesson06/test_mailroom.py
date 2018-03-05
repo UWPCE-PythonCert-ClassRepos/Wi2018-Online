@@ -11,4 +11,5 @@ m4m = m4.Mailroom()
 print(m4m.donor_table_dict)
 
 
-
+if __name__ == '__main__':
+    unittest.main()

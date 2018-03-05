@@ -47,11 +47,6 @@ save@kids.org
                     print("Not entered. Please enter a positive number value for the donation amount.")
 
 
-#def listsum(input_table):
-#    """Sums all elements of a list."""
-#    return sum(input_table)
-
-
     def create_report(self, create_report_dict):
         print("{:<20} | {:<10} | {:<10} | {:<10}".format("Donor Name", "Total Given", "Num Gifts", "Average Gift"))
         print("----------------------------------------------------------------------------")
