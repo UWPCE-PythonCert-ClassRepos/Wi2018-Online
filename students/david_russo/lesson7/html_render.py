@@ -122,6 +122,27 @@ class A(Element):
 		kwargs["href"] = link
 		Element.__init__(self, content = content, **kwargs)
 
+class Ul(Element):
+	"""
+	Subclass of class element, specifically for elements of type "un-ordered list"
+	"""
+	tag = "ul"
+
+class Li(Element):
+	"""
+	Subclass of class Element, specifically for elements of type "list"
+	"""
+	tag = "li"
+
+class H(OneLineTag):
+	"""
+	Subclass of OneLineTag class
+	"""
+	def __init__(self, level, content = None, **kwargs):
+		self.tag = "h" + str(level)
+		Element.__init__(self, content, **kwargs)
+
+
 
 
 
