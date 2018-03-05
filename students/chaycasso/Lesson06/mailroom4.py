@@ -6,11 +6,12 @@
 
 from collections import OrderedDict
 
+
 class Mailroom(object):
 
     def __init__(self):
     # Initial donor table with the donation values.
-        donor_table_dict = {"William Gates, III": [401321.52, 201342.71], "Mark Zuckerberg": [123.45, 5123.21, 8213.11],
+        self.donor_table_dict = {"William Gates, III": [401321.52, 201342.71], "Mark Zuckerberg": [123.45, 5123.21, 8213.11],
                         "Jeff Bezos": [877.33], "Paul Allen": [152.42, 30.54, 825.21], "Steve Ballmer": [5198.96, 654.98]}
         answer = ""
 
@@ -79,16 +80,16 @@ save@kids.org
         while True:
             try:
                 print("Main Menu\n1. Send a Thank You\n2. Create a Report\n3. Send Letters to All\n4. Quit")
-                answer_dict = {"1": thank_you,
-                               "2": create_report,
-                               "3": send_letters,
+                answer_dict = {"1": Mailroom.thank_you,
+                               "2": Mailroom.create_report,
+                               "3": Mailroom.send_letters,
                                "4": "quit"}
                 answer = input("Please select an option. >")
                 if answer == "4" or answer == "quit":
                     print("Have a nice day.")
                     break
                 else:
-                    answer_dict[answer](donor_table_dict)
+                    answer_dict[answer](self, self.donor_table_dict)
             except KeyError:
                 print()
 
