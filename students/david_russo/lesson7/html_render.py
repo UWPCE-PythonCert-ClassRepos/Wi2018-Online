@@ -16,8 +16,9 @@ class Element():
 	tag = "html"
 	indentation = 4 * " "
 
-	def __init__(self, content=None):
+	def __init__(self, content=None, **kwargs):
 		self.content = []
+		self.attributes = kwargs
 		if content != None:
 			self.content.append(content)
 
@@ -28,7 +29,13 @@ class Element():
 			self.content.append(TextWrapper(str(extra_content)))
 
 	def render(self, file_out, cur_ind = ""):
-		file_out.write("<{}>\n".format(self.tag))
+		file_out.write("<{}".format(self.tag))
+
+		for key, value in self.attributes.items():
+			file_out.write(' {}="{}"'.format(key, value))
+
+		file_out.write(">")
+
 		for stuff in self.content:
 			try:
 				stuff.render(file_out, cur_ind + self.indentation)
@@ -70,12 +77,51 @@ class OneLineTag(Element):
 	"""
 	def render(self, file_out, cur_ind = ""):
 		file_out.write("<{}> ".format(self.tag))
+
 		for stuff in self.content:
 			file_out.write(str(stuff))
+
 		file_out.write("</{}>".format(self.tag))
 
 class Title(OneLineTag):
-    tag = "title"
+	"""
+	Subclass of OneLineTag class, specifically for elements of type title
+	"""
+	tag = "title"
+
+class SelfClosingTag(Element):
+	"""
+	Subclass of Element class, with a render method just for the tag and attributes
+	"""
+	def render(self, file_out, cur_ind = ""):
+		file_out.write("<{}".format(self.tag))
+
+		for key, value in self.attributes.items():
+			file_out.write(' {}="{}"'.format(key, value))
+
+		file_out.write(" />")
+
+class Hr(SelfClosingTag):
+	"""
+	Subclass of SelfClosingTag specifically for horizontal rules
+	"""
+	tag = "hr"
+
+class Br(SelfClosingTag):
+	"""
+	Subclass of SelfClosingTag specifically for line breaks
+	"""
+	tag = "br"
+
+class A(Element):
+	"""
+	A is an anchor link, which is  a subclass of Element
+	"""
+	tag = "a"
+	def __init__(self, link, content = None, **kwargs):
+		kwargs["href"] = link
+		Element.__init__(self, content = content, **kwargs)
+
 
 
 

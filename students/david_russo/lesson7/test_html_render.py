@@ -22,10 +22,9 @@ class html_render_TestCase(unittest.TestCase):
 		elem = hr.P()
 		self.assertEqual(elem.tag, "p")
 	
-	def test_p_append(self):
-		elem = hr.P("this")
-		elem.append("that")
-		self.assertEqual(elem.content, ["this", "that"])
+	def test_title_tag_is_title(self):
+		elem = hr.Title()
+		self.assertEqual(elem.tag, "title")
 
 if __name__ == '__main__':
     unittest.main()
