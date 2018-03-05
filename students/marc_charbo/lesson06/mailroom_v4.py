@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import logging
 import logging.config
 
@@ -8,21 +6,21 @@ logging.config.fileConfig('logging.conf')
 # create logger
 logger = logging.getLogger('mailRoom')
 
-DONOR_LIST = {'Jim':[25.00,150.00,2000.00,100000.00],'Linda':[10000.25],'Bob':[5.03,100.01,6.00]}
+DONOR_LIST = {'Jim':[25.00, 150.00, 2000.00, 100000.00],'Linda':[10000.25],'Bob':[5.03, 100.01, 6.00]}
 
 def send_letter():
     """write thank you note to all users in donor list"""
     for key, value in DONOR_LIST.items():
-        file = open(key+'.txt', 'w')
-        file.write('Dear {},\n'.format(key))
-        file.write('\n')
-        file.write('\tThank you for your very kind donation of ${:.2f},\n'.format(sum(value)))
-        file.write('\n')
-        file.write('\tIt will be put to very good use.\n')
-        file.write('\n')
-        file.write('\t\t\tSincerely,\n')
-        file.write('\t\t\t\t-The Team')
-        file.close()
+        with open(key+'.txt', 'w') as file:
+            file.write('Dear {},\n'.format(key))
+            file.write('\n')
+            file.write('\tThank you for your very kind donation of ${:.2f},\n'.format(sum(value)))
+            file.write('\n')
+            file.write('\tIt will be put to very good use.\n')
+            file.write('\n')
+            file.write('\t\t\tSincerely,\n')
+            file.write('\t\t\t\t-The Team')
+            file.close()
 
     logging.info('Saved letter on disk')
 
@@ -87,7 +85,7 @@ def prompt_user():
     
     return int(selection)
 
-dispatch_dict = {1:send_thank_you,2:create_report,3:send_letter,4:quit}
+dispatch_dict = {1: send_thank_you, 2: create_report, 3: send_letter, 4: quit}
 
 def run():
     """ function which runs program"""
