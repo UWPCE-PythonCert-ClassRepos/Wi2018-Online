@@ -36,7 +36,7 @@ class Element():
 			except AttributeError:
 			    file_out.write(cur_ind + self.indentation + stuff)
 			    file_out.write("\n")
-		file_out.write("<\{}>".format(self.tag))
+		file_out.write("</{}>".format(self.tag))
 
 
 
@@ -54,15 +54,28 @@ class Body(Element):
 
 class P(Element):
 	"""
-	Subclass of Element class, specifically for element of type 'p'
+	Subclass of Element class, specifically for elements of type 'p'
 	"""
 	tag = "p"
 
 class Head(Element):
 	"""
-	Subclass of Element class, specifically for element of type 'head'
+	Subclass of Element class, specifically for elements of type 'head'
 	"""
 	tag = "head"
+
+class OneLineTag(Element):
+	"""
+	Subclass of Element class, specifically for elements of type 'one line'
+	"""
+	def render(self, file_out, cur_ind = ""):
+		file_out.write("<{}> ".format(self.tag))
+		for stuff in self.content:
+			file_out.write(str(stuff))
+		file_out.write("</{}>".format(self.tag))
+
+class Title(OneLineTag):
+    tag = "title"
 
 
 
