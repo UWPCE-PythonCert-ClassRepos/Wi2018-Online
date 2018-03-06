@@ -16,25 +16,26 @@ class Mailroom(object):
         answer = ""
 
 
-    def thank_you(self, thank_you_dict):
+    def thank_you(self, thank_you_dict, full_name, donation_value_str):
         while True:
-            full_name = input("Please enter a full name. >")
-            if full_name.lower() == "quit": return(thank_you_dict)
+            if full_name.lower() == "quit": return thank_you_dict, ""
             if full_name.lower() == "list":
-                print("Donor list:")
-                print(list(thank_you_dict.keys()))
+                output_string = "Donor list:\n"
+                for i in (list(thank_you_dict.keys())):
+                    output_string = output_string + i + "\n"
+                return thank_you_dict, output_string
             else:
-                donation_value_str = input("Please enter a donation amount. >")
-                if donation_value_str.lower() == "quit": return(thank_you_dict)
+                if donation_value_str.lower() == "quit": return thank_you_dict, ""
                 try:
                     donation_value_flt = float(donation_value_str)
-                    if donation_value_flt <= 0: raise ValueError
+                    if donation_value_flt <= 0:
+                        raise ValueError
                     if full_name in thank_you_dict:
                         thank_you_dict[full_name].append(donation_value_flt)
                     else:
                         thank_you_dict[full_name]=[donation_value_flt]
                     print()
-                    print("""
+                    output_string = ("""
 Dear {}:
     Thank you for your generous donation of ${:.2f} to Save the Kids.
                     
@@ -42,18 +43,20 @@ Dear {}:
 Save the Kids
 save@kids.org
                     """.format(full_name, donation_value_flt))
-                    return(thank_you_dict)
+                    return(thank_you_dict, output_string)
                 except ValueError:
-                    print("Not entered. Please enter a positive number value for the donation amount.")
+                    output_string = "Not entered. Please enter a positive number value for the donation amount."
+                    return thank_you_dict, output_string
 
 
     def create_report(self, create_report_dict):
-        print("{:<20} | {:<10} | {:<10} | {:<10}".format("Donor Name", "Total Given", "Num Gifts", "Average Gift"))
-        print("----------------------------------------------------------------------------")
+        output_string = "{:<20} | {:<10} | {:<10} | {:<10}\n".format("Donor Name", "Total Given", "Num Gifts", "Average Gift")
+        output_string += "----------------------------------------------------------------------------\n"
         order_dict = OrderedDict(sorted(create_report_dict.items()))
         for key in order_dict:
-            print("{:<20}   ${:>10.2f}   {:>10d}   ${:>10.2f}".format(key, sum(order_dict[key]), len(order_dict[key]),
+            output_string += ("{:<20}   ${:>10.2f}   {:>10d}   ${:>10.2f}\n".format(key, sum(order_dict[key]), len(order_dict[key]),
                                                                       sum(order_dict[key]) / len(order_dict[key])))
+        return create_report_dict, output_string
 
 
     def send_letters(self, send_letters_dict):
@@ -80,7 +83,15 @@ save@kids.org
                                "3": Mailroom.send_letters,
                                "4": "quit"}
                 answer = input("Please select an option. >")
-                if answer == "4" or answer == "quit":
+                if answer == "1":
+                    name = input("Please enter a full name. >")
+                    donation = input("Please enter a donation amount. >")
+                    self.donor_table_dict, print_string = answer_dict[answer](self, self.donor_table_dict, name, donation)
+                    print(print_string)
+                elif answer == "2":
+                    self.donor_table_dict, print_string = answer_dict[answer](self, self.donor_table_dict)
+                    print(print_string)
+                elif answer == "4" or answer == "quit":
                     print("Have a nice day.")
                     break
                 else:
