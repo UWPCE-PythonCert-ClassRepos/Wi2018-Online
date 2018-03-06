@@ -6,7 +6,6 @@
 
 from collections import OrderedDict
 
-
 class Mailroom(object):
 
     def __init__(self):
@@ -17,6 +16,7 @@ class Mailroom(object):
 
 
     def thank_you(self, thank_you_dict, full_name, donation_value_str):
+        output_string = ""
         while True:
             if full_name.lower() == "quit": return thank_you_dict, ""
             if full_name.lower() == "list":
