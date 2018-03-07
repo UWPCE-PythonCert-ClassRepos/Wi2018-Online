@@ -70,7 +70,7 @@ Dear {}:
 -------------
 Save the Kids
 save@kids.org
-                    """.format(key, send_letters_dict[key][-1], sum(send_letters_dict[key]))
+""".format(key, send_letters_dict[key][-1], sum(send_letters_dict[key]))
                 writefile.write(letter)
         print("Letters have been created.\n")
 
