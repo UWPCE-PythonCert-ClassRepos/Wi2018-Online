@@ -106,6 +106,22 @@ save@kids.org
                     """
         self.assertDictEqual(target_table_dict, new_dict)
 
+    def test_create_report(self):
+        """Report generated for dictionary."""
+        donor_table_dict = {"William Gates, III": [401321.52, 201342.71], "Mark Zuckerberg": [123.45, 5123.21, 8213.11],
+                            "Jeff Bezos": [877.33], "Paul Allen": [152.42, 30.54, 825.21],
+                            "Steve Ballmer": [5198.96, 654.98]}
+        m = Mailroom()
+        new_dict, output_string = m.create_report(donor_table_dict)
+        assert output_string == """Donor Name           | Total Given | Num Gifts  | Average Gift
+----------------------------------------------------------------------------
+Jeff Bezos             $    877.33            1   $    877.33
+Mark Zuckerberg        $  13459.77            3   $   4486.59
+Paul Allen             $   1008.17            3   $    336.06
+Steve Ballmer          $   5853.94            2   $   2926.97
+William Gates, III     $ 602664.23            2   $ 301332.11
+"""
+        self.assertDictEqual(donor_table_dict, new_dict)
 
 
 if __name__ == '__main__':
