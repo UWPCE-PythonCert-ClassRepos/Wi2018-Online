@@ -123,6 +123,26 @@ William Gates, III     $ 602664.23            2   $ 301332.11
 """
         self.assertDictEqual(donor_table_dict, new_dict)
 
+    def test_send_letters(self):
+        """Test that send letters function has been triggered and created a sample letter."""
+        donor_table_dict = {"William Gates, III": [401321.52, 201342.71], "Mark Zuckerberg": [123.45, 5123.21, 8213.11],
+                            "Jeff Bezos": [877.33], "Paul Allen": [152.42, 30.54, 825.21],
+                            "Steve Ballmer": [5198.96, 654.98]}
+        m = Mailroom()
+        m.send_letters(donor_table_dict)
+        with open("William Gates, III.txt", "r") as readfile:
+            letter = readfile.read()
+            print(letter)
+            assert letter == """
+Dear William Gates, III:
+    Thank you for your recent donation of $201342.71 to Save the Kids. We are grateful for your total donations of $602664.23 
+    to our organization.
+                     
+-------------
+Save the Kids
+save@kids.org
+"""
+
 
 if __name__ == '__main__':
     unittest.main()
