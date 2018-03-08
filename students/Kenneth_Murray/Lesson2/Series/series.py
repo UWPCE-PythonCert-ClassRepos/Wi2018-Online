@@ -7,14 +7,14 @@ def fibonacci(n):
 		c = a + b
 		a, b = b, a + b
 		if i == n:
-			print(c)
+			return c
 		i = i + 1	#add 1 and return to beginning of while loop
 	if n == 1:
 		c = a
-		print(c)
+		return c
 	if n == 2:
 		c = b
-		print(c)
+		return c
 			
 def lucas(n):
 	"""prints the Nth lucas number in the series"""
@@ -25,14 +25,14 @@ def lucas(n):
 		c = a + b
 		a, b = b, a + b
 		if i == n:
-			print(c)
+			return c
 		i = i + 1	#add 1 and return to beginning of while loop
 	if n == 1:
 		c = a
-		print(c)
+		return c
 	if n == 2:
 		c = b
-		print(c)
+		return c
 
 def sum_series(n,a=0,b=1):
 	"""Prints the nth number in a series defined by a and b"""
@@ -42,14 +42,34 @@ def sum_series(n,a=0,b=1):
 		c = a + b
 		a, b = b, a + b
 		if i == n:
-			print(c)
+			return c
 		i = i + 1	#add 1 and return to beginning of while loop
 	if n == 1:
 		c = a
-		print(c)
+		return c
 	if n == 2:
 		c = b
-		print(c)
+		return c
+		
+"""test the series code"""
+if __name__ == "__main__":
+	print("Running tests on the series functions")
+	assert fibonacci(1) == 0
+	assert fibonacci(2) == 1
+	assert fibonacci(5) == 3
+	print("fibonacci tests are complete")
+	assert lucas(1) == 2
+	assert lucas(2) == 1
+	assert lucas(5) == 7
+	print("lucas tests are complete")
+	assert sum_series(1) == 0
+	assert sum_series(2) == 1
+	assert sum_series(5) == 3
+	assert sum_series(1,2,1) == 2
+	assert sum_series(5,2,1) == 7
+	print("the sum_series tests are comlete")
+	print("this concludes all testing")
+	
 		
 
 		
