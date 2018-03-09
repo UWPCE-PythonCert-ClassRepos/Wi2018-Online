@@ -1,0 +1,49 @@
+def exchange_first_last(seq):
+mid=l[1:-1]
+
+In [111]: mid
+Out[111]: [2, 3, 4, 5]
+
+In [112]: last
+Out[112]: 6
+
+In [113]: l.insert(0,last)
+
+In [114]: l
+Out[114]: [6, 1, 2, 3, 4, 5, 6]
+
+In [115]: first
+Out[115]: 1
+
+In [116]: eos=len(l)
+
+In [117]: eos
+Out[117]: 7
+
+In [118]: l.insert(eos,first)
+
+In [119]: l
+Out[119]: [6, 1, 2, 3, 4, 5, 6, 1]
+
+
+def return_every_other(seq, i=2):
+
+
+
+def remove_some_with_step(seq, r=-4, i=2):
+
+
+
+def reverse_slice(seq):
+
+
+
+def seq_shell_game(seq):
+
+
+
+
+
+
+
+	
