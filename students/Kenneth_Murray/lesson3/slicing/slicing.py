@@ -32,8 +32,24 @@ if __name__ == "__main__":
 	print("The return_every_other function test has competed successfully")
 	
 
-def remove_some_with_step(seq, r=-4, i=2):
-
+def remove_some_with_step(seq, r=4, i=2):
+	"""This will remove the first and last four characters along with every other character."""
+	"""A minimum of 10 characters are required."""
+	eos = len(seq)
+	if len(seq) > 9:
+		mid = seq[4:-4]
+		return mid[::2]
+	else:
+		print("this requires a minimum of 10 characters")
+		
+"""testing return_every_other function"""
+if __name__ == "__main__":
+	list = [0,1,2,3,4,5,16,17,8,9,10,12]
+	string = "the string test is good"
+	assert return_every_other(list) == [4,16]
+	assert return_every_other(string) == 'srn eti '
+	print("The return_every_other function test has competed successfully")
+"""
 
 
 def reverse_slice(seq):
