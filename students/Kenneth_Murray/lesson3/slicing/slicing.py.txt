@@ -1,31 +1,26 @@
 def exchange_first_last(seq):
-mid=l[1:-1]
+	"""returns a sequence with the first and last characters swapped"""
+	first = seq[0]
+	mid = seq[1:-1]
+	last = seq[-1]
+	
+	if type(seq) == str:
+		return last + mid + first
+	else:
+		eos=len(seq)
+		mid.insert(0,last)
+		mid.insert(eos,first)
+		return mid
 
-In [111]: mid
-Out[111]: [2, 3, 4, 5]
-
-In [112]: last
-Out[112]: 6
-
-In [113]: l.insert(0,last)
-
-In [114]: l
-Out[114]: [6, 1, 2, 3, 4, 5, 6]
-
-In [115]: first
-Out[115]: 1
-
-In [116]: eos=len(l)
-
-In [117]: eos
-Out[117]: 7
-
-In [118]: l.insert(eos,first)
-
-In [119]: l
-Out[119]: [6, 1, 2, 3, 4, 5, 6, 1]
-
-
+	if __name__ == __main__:
+		string = "the string test is good"
+		list = [1,2,3,4,5,6,7]
+		
+		assert exchange_first_last(list) == [7,2,3,4,5,6,1]
+		assert exchange_first_last(string) == "dhe string test was goot"
+		print ("the exchange test is complete")
+		
+			
 def return_every_other(seq, i=2):
 
 
