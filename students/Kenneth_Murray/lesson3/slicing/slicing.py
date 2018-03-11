@@ -11,14 +11,14 @@ def exchange_first_last(seq):
 		mid.insert(0,last)
 		mid.insert(eos,first)
 		return mid
-
-	if __name__ == __main__:
-		string = "the string test is good"
-		list = [1,2,3,4,5,6,7]
 		
-		assert exchange_first_last(list) == [7,2,3,4,5,6,1]
-		assert exchange_first_last(string) == "dhe string test was goot"
-		print ("the exchange test is complete")
+"""testing the exchange function"""
+if __name__ == "_main__":
+	string = "the string test is good"
+	list = [1,2,3,4,5,6,7]
+	assert exchange_first_last(list) == [7,2,3,4,5,6,1]
+	assert exchange_first_last(string) == "dhe string test was goot"
+	print ("the exchange test is complete")
 		
 			
 def return_every_other(seq, i=2):
