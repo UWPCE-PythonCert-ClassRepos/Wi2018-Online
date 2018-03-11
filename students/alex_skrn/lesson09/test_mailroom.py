@@ -2,8 +2,8 @@
 import pytest
 import datetime
 from unittest.mock import Mock
-from  mailroom import SingleDonor
-from mailroom import Donors
+from unittest.mock import patch
+from  mailroom import *
 
 
 @pytest.fixture()
@@ -14,27 +14,21 @@ def donors():
     d3 = SingleDonor("Jesse Eisenberg", [99.99, 1.75])
     return Donors([d1, d2, d3])
 
-# TESTS FOR THE SINGLEDONOR CLASS
+# TESTS FOR THE SINGLE DONOR CLASS
 def test_init_single_donor():
     """Test SingleDonor class instantiation, name and donations properties."""
-    d = SingleDonor("Bill Murray", 125)
-    assert d.name == "Bill Murray"
-    assert d.donations[-1] == 125
-
-
-def test_add_donation():
-    """Test add_donation() method of the SimpleDonor class."""
-    d = SingleDonor("Bill Murray", 125)
-    d.add_donation(8.55)
-    assert d.donations == [125, 8.55]
-
-
-def test_get_total():
-    """Test get_total() method of the SimpleDonor class."""
-    d = SingleDonor("Bill Murray", 125)
-    d.add_donation(8.55)
-    assert d.get_total() == 133.55
-
+    # what if an int is passed as a donation?
+    d1 = SingleDonor("Bill Murray", 125)
+    # what if a list is passed?
+    d2 = SingleDonor("Woody Harrelson", [71.5, 1.25])
+    # what if a tuple is passed?
+    d3 = SingleDonor("Jesse Eisenberg", (99.99, 1.75))
+    assert d1.name == "Bill Murray"
+    assert d1.donations == [125]
+    assert d2.name == "Woody Harrelson"
+    assert d2.donations == [71.5, 1.25]
+    assert d3.name == "Jesse Eisenberg"
+    assert d3.donations == [99.99, 1.75]
 
 def test_str_single_donor(capsys):
     """Test __str__ in the SingleDonor class."""
@@ -51,6 +45,35 @@ def test_repr_single_donor():
     assert eval(repr(d)) == SingleDonor("Bill Murray", 125)
 
 
+def test_eq_single_donor(donors):
+    """Test equality."""
+    d1 = SingleDonor("Bill Murray", [125, 1.0])
+    d2 = SingleDonor("Bill Murray", [125, 1.0])
+    d3 = SingleDonor("Woody Harrelson", [71.5, 1.25])
+    assert d1 == d2
+    assert d1 != d3
+
+# def test_lt_single_donor(donors):  # don't understand how __lt__ works
+#     """Test less than special method."""
+#     d1 = SingleDonor("Bill Murray", [125, 1.0])
+#     d2 = SingleDonor("Bill",[125, 1.0])
+#     assert d1 < d2
+
+
+def test_add_donation():
+    """Test add_donation() method of the SimpleDonor class."""
+    d = SingleDonor("Bill Murray", 125)
+    d.add_donation(8.55)
+    assert d.donations == [125, 8.55]
+
+
+def test_get_last_donation():
+    """Test if I can get the last donation."""
+    d1 = SingleDonor("Bill Murray", 125)
+    d2 = SingleDonor("Jesse Eisenberg", (99.99, 1.75))
+    assert d1.get_last_donation() == 125
+    assert d2.get_last_donation() == 1.75
+
 # TESTS FOR THE DONORS CLASS
 def test_init_donors():
     """The Donors class instantiation."""
@@ -60,7 +83,7 @@ def test_init_donors():
 
 
 def test_iter_donors(donors):
-    """Test that I can iterate over a donors class object."""
+    """Test if I can iterate over a donors class object."""
     names = []
     for donor in donors:
         names.append(donor.name)
@@ -72,7 +95,7 @@ def test_sort_donors_by_total(donors):
     sorted_copy = sorted(donors, key=SingleDonor.sort_by_total, reverse=True)
     donors_list = [donor.name for donor in sorted_copy]
     assert donors_list == ["Bill Murray", "Jesse Eisenberg", "Woody Harrelson"]
-    donors_list_amount = [(donor.name, donor.get_total()) for donor in sorted_copy]
+    donors_list_amount = [(donor.name, sum(donor.donations)) for donor in sorted_copy]
     assert donors_list_amount == [("Bill Murray", 126.0),
                                   ("Jesse Eisenberg", 101.74),
                                   ("Woody Harrelson", 72.75)
@@ -92,44 +115,124 @@ def test_print_donor_names(capsys, donors):
     out, _ = capsys.readouterr()
     assert out.strip() == "Bill Murray, Jesse Eisenberg, Woody Harrelson"
 
+def test_contains(donors):
+    """Test if I can check that a donor is in donors by name."""
+    assert "Bill Murray" in donors
 
 def test_write_report(capsys, donors):
     """Test that the report at least contains certain elements."""
-    report = donors.create_report()
+    donors.create_report()
     out, _ = capsys.readouterr()
     assert "Bill Murray" in out
     assert "Woody Harrelson" in out
     assert out.index("Bill Murray") < out.index("Woody Harrelson")
 
 
-# def test_get_email(donors):
-#     """Test some elements of get_email(name, amount) method in Donors class."""
-#     assert donors.get_email("A", 100).startswith("\nDear A")
-#     assert donors.get_email("A", 100).strip().endswith("The Organization")
-
-def test_contains_donors(donors):
-    """Test the __contains__ method in the Donors class."""
-    assert "Bill Murray" in donors
-
-
 def test_get_donor_in_donors(donors):
+    """Test if I can get a donor class object from a collection, by name."""
     d = donors.get_donor("Woody Harrelson")
     assert isinstance(d, SingleDonor)
+    assert d.name == "Woody Harrelson"
+
 
 
 # TESTS FOR THE STARTMENU CLASS
-# def test_init_start_menu():
-#     """Test the StartMenu class istantiation."""
-#     s = StartMenu()
-#
+# This class is too complicated for me to test as a whole
+# so I found a solution in the Internet how to mock complicated  __init__
+# in the class and test only simple methods within the class.
+# The explanation is at
+# https://medium.com/@george.shuklin/mocking-complicated-init-in-python-6ef9850dd202
+def test_menu_selection(monkeypatch):
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        # User is prompted to enter something when the main menu is displayed
+        # But chooses the option to quit immediately.
+        # The line below simulates the user entering "125" in the terminal
+        # This value "125" is arbitrary in this test
+        monkeypatch.setattr('builtins.input', lambda _: "125")
+
+        # Now fake all methods that the menu_selection would call:
+        # Fake the main dispatch dict
+        s.main_dispatch = Mock()
+        # This assigns the key "125" the value "s.quit" in the dispatch dict
+        s.main_dispatch.return_value = {"125": s.quit}
+
+        # Fake quit() which would be called by main_dispatch()
+        s.quit = Mock()
+        s.quit.return_value = "exit menu"
+
+        assert s.menu_selection("prompt", s.main_dispatch()) is None
 
 
-# def test_add_new_donor_donation(donors):
-#     """add_donation(name, amount) for a new donor."""
-#     mailroom.add_donation("Alex Skrn", 0.0)
-#     assert mailroom.donors["Alex Skrn"] == [0.0]
-#
-#
+def test_quit():
+    """Test the quit() method."""
+    # This mocks the complicated __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        assert s.quit() == "exit menu"
+
+
+def test_main_dispatch(donors):
+    """Test that the main_dispatch() method at least returns a dict."""
+    # This mocks the complicated __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        # Need to fake a self._donors object within the StartMenu class
+        # which object is used in the main_dispatch() method
+        s._donors = Mock()
+        s._donors.return_value = donors
+
+        assert isinstance(s.main_dispatch(), dict)
+
+
+def test_main_prompt():
+    """Test the main_prompt() method."""
+    # This mocks the complicated __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        assert "Main Menu" in s.main_prompt()
+        assert "0 - Quit\n" in s.main_prompt()
+
+
+def test_send_thanks_dispatch(donors):
+    """Test that the send_thanks_dispatch() method at least returns a dict."""
+    # This mocks the complicated __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        # Need to fake a self._donors object within the StartMenu class
+        # which object is used in the send_thanks_dispatch() method
+        s._donors = Mock()
+        s._donors.return_value = donors
+
+        assert isinstance(s.send_thanks_dispatch(), dict)
+
+
+def test_send_thanks_prompt():
+    """Test the send_thanks_prompt() method."""
+    # This mocks the complicated __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        assert "Send-Thank-You Sub-Menu" in s.send_thanks_prompt()
+        assert "0 - Quit\n" in s.send_thanks_prompt()
+
+
+def test_get_email():
+    """Test the get_email() method."""
+    # This mocks the complicated __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        mail = s.get_email("Bob", 125.25)
+
+        assert "Dear Bob" in mail
+        assert "$125.25" in mail
+
 # def test_add_exist_donor_donation(donors):
 #     """add_donation(name, amount) for an existing donor."""
 #     mailroom.add_donation("A", 1000.0)
@@ -153,6 +256,12 @@ def test_get_donor_in_donors(donors):
 #     """_old_donor_interaction() user enters zero on prompt."""
 #     monkeypatch.setattr('builtins.input', lambda _: "0")
 #     assert mailroom.old_donor_interaction() is None
+#
+#
+# def test_get_email(donors):
+#     """Test some elements of get_email(name, amount) method in Donors class."""
+#     assert donors.get_email("A", 100).startswith("\nDear A")
+#     assert donors.get_email("A", 100).strip().endswith("The Organization")
 #
 #
 # def test_new_donor_interaction_user_input_zero(monkeypatch):
@@ -247,10 +356,11 @@ def test_get_donor_in_donors(donors):
 #     # Check that the print statement in the function is okey
 #     # Check that the function indeed created 2 files
 #     # Check that the files created are not empty at least
-#     mailroom.ask_user_dir = Mock()
-#     mailroom.ask_user_dir.return_value = tmpdir
+#     s = StartMenu(donors)
+#     s.ask_user_dir = Mock()
+#     s.ask_user_dir.return_value = tmpdir
 #
-#     mailroom.write_select_dir()
+#     s.write_select_dir()
 #     out, _ = capsys.readouterr()
 #     expected = ("\nAll letters saved in {}\n".format(str(tmpdir))).strip()
 #     assert out.strip() == expected
@@ -271,18 +381,18 @@ def test_get_donor_in_donors(donors):
 #     assert mailroom.write_select_dir() is None
 #
 #
-# def test_menu_selection_user_choice_quit(monkeypatch):
+# def test_menu_selection_user_choice_quit(monkeypatch, donors):
 #     """menu_selection(). User chooses to quit."""
 #     # User is prompted to enter something
 #     # But chooses the option to quit immediately
 #     monkeypatch.setattr('builtins.input', lambda _: "125")
 #
 #     # Fake the dispatch dict
-#     mailroom.main_dispatch = Mock()
-#     mailroom.main_dispatch.return_value = {"125": mailroom.quit}
+#     StartMenu.main_dispatch = Mock()
+#     StartMenu.main_dispatch.return_value = {"125": StartMenu.quit}
 #
 #     # Fake quit()
-#     mailroom.quit = Mock()
-#     mailroom.quit.return_value = "exit menu"
+#     StartMenu.quit = Mock()
+#     StartMenu.quit.return_value = "exit menu"
 #
-#     assert mailroom.menu_selection("prompt", mailroom.main_dispatch()) is None
+#     assert StartMenu(donors).menu_selection("prompt", StartMenu.main_dispatch()) is None
