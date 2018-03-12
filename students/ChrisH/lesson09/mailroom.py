@@ -73,10 +73,12 @@ class Donors(object):
     def load_donorlist(self):
         with open(self.DATA_FILE, 'rb') as file_in:
             self.donorlist = pickle.load(file_in)
+        return self.count
 
     def save_donorlist(self):
         with open(self.DATA_FILE, 'wb') as file_out:
             pickle.dump(self.donorlist, file_out)
+        return self.count
 
 class Donor(object):
 

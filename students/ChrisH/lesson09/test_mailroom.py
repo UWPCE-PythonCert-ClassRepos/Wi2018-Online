@@ -9,20 +9,24 @@ import os
 import sys
 import unittest
 
-import mailroom as mr
+from mailroom import Donors, Donor
 
 
 class MailroomTest(unittest.TestCase):
 
     def setUp(self):
-        mr.donor_data = \
-            {mr.Donor('Al', 'Donor1'): [10.00, 20.00, 30.00, 40.00, 50.00],
-             mr.Donor('Bert', 'Donor2'): [10.00],
-             mr.Donor('Connie', 'Donor3'): [10.00, 10.00, 10.01],
-             mr.Donor('Dennis', 'Donor4'): [10.00, 20.00, 20.00],
-             mr.Donor('Egbert', 'Donor5'): [10.39, 20.21, 10.59, 4000.40],
-             mr.Donor('TESTME', 'TESTME'): [11.39, 22.21, 11.59, 4001.40],
-             }
+        self.dl = Donors()
+        self.dl.DATA_FILE = 'test_donors.pkl'   # Create instance value for DATA_FILE to override class value
+        self.dl.load_donorlist()
+        self.dl.print_report()
+
+    def tearDown(self):
+        # Removes files created by test_send_letters_all
+        for filename in os.listdir('.'):
+            if filename.endswith('.txt'):
+                donorname = ((filename[9:-4]).replace("_", " ")).split()
+                if mr.Donor(donorname[0], ' '.join(donorname[1:])) in mr.donor_data.keys():
+                    os.remove(filename)
 
     def test_donor_count(self):
         self.assertEqual(6, len(mr.donor_data))
@@ -72,13 +76,7 @@ TESTME TESTME              $    4046.59           4  $     1011.65
         self.assertIsNotNone(mr.get_donor('Al Donor1'))
         self.assertIsNotNone(mr.get_donor('NEW DONOR'))
 
-    def tearDown(self):
-        # Removes files created by test_send_letters_all
-        for filename in os.listdir('.'):
-            if filename.endswith('.txt'):
-                donorname = ((filename[9:-4]).replace("_", " ")).split()
-                if mr.Donor(donorname[0], ' '.join(donorname[1:])) in mr.donor_data.keys():
-                    os.remove(filename)
+
 
 
 if __name__ == "__main__":
