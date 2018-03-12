@@ -6,61 +6,85 @@
 
 import time
 
-from collections import namedtuple
 
-# Giving namedtuples a shot
-Donor = namedtuple('Donor', 'first,last')
+class Donors(object):
 
+    def __init__(self):
+        self.donorlist = []
 
-# Global data structure
-donor_data = \
-    {Donor('Al', 'Donor1'): [10.00, 20.00, 30.00, 40.00, 50.00],
-     Donor('Bert', 'Donor2'): [10.00],
-     Donor('Connie', 'Donor3'): [10.00, 10.00, 10.01],
-     Donor('Dennis', 'Donor4'): [10.00, 20.00, 20.00],
-     Donor('Egbert', 'Donor5'): [10.39, 20.21, 10.59, 4000.40],
-     }
+    def add_donor(self, donor):
+        self.donorlist.append(donor)
 
+    def print_report(self):
+        """
+        Prints a formatted report on the donors with name, amount given, number of gifts, and average gift.
+        :return: None
+        """
+        # Find longest name in donor list, or use name_min value
+        name_max = max(*[len(donor.name) for donor in self.donorlist], 25)
 
-def get_donor_fullname(donor):
-    """
-    Given a donor namedtuple, assembles and returns the donor's full name.
-    :param donor: namedtuple type: Donor
-    :return: string with donor's full name
-    """
-    return (donor.first + ' ' + donor.last).strip()   # Strip, in case first name is blank
+        rpt_title = "Donor Name" + ' ' * (name_max - 9) + "| Total Given | Num Gifts | Average Gift"
+        print(rpt_title)
+        print("-" * len(rpt_title))
+        for donor in self.donorlist:
+            print(f"{donor.name:{name_max}}  ", end='')
+            ddons = donor.donations
+            print(f"$ {sum(ddons):>10.2f}   {len(ddons):>9}  ${sum(ddons)/len(ddons):>12.2f}")
 
-
-def menu(menu_data):
-    """
-    Prints the main user menu & retrieves user selection.
-    :param: a menu list, consisting of tuples with two values:
-        [0]: text to be presented to user
-        [1]: function that should be called for the menu item
-    :return: the function corresponding to the user's selection, or None on a bad selection
-        raises ValueError if choice is non-numeric
-    """
-    print("\nPlease choose one of the following options:")
-
-    for index, menu_item in enumerate(menu_data):   # Prints the menu user text
-        print(f"{index + 1}) {menu_item[0]}")
-
-    choice = int(input("> ")) - 1
-
-    if choice in range(len(menu_data)):             # Ensure that option chosen is within menu range
-        return menu_data[choice][1]                 # this handles choosing 0, which would return menu_data[-1][1]
-
-    return None
+    def send_letters_all(self):
+        """
+            Runs through donor data structure, generates a thank you letter for each and saves it to
+            the current working directory with in a date+donorname.txt file
+            :return: None
+            """
+        for donor in self.donorlist:
+            print(f'Generating letter for {donor.name}')
+            now = time.localtime()
+            f_name = f"{now.tm_year}{now.tm_mon:02}{now.tm_mday:02}_"
+            f_name += donor.name.replace(" ", "_") + ".txt"
+            with open(f_name, 'w') as file_out:
+                file_out.write(donor.generate_letter())
+        return None
 
 
-def generate_letter(donor):
-    """
-    Generates a Thank You letter to send to a donor. Uses the last value in their donations list to
-    mention their last donation amount.
-    :param donor: a donor dictionary entry
-    :return: string containing the text of the Thank You letter.
-    """
-    format_string = """
+class Donor(object):
+
+    def __init__(self, name):
+        if not name:
+            raise ValueError("Donor name cannot be empty.")
+        self.name = name
+        self.donations = []
+
+    @property
+    def first(self):
+        name_sp = self.name.split()
+        if len(name_sp) == 1:
+            return None
+        else:
+            return name_sp[0]
+
+    @property
+    def last(self):
+        name_sp = self.name.split()
+        if len(name_sp) == 1:
+            return self.name
+        else:
+            return ' '.join(name_sp[1:])
+
+    def add_donation(self, amount):
+        if float(amount) <= 0:
+            raise ValueError('Donation amount must be a positive number.')
+        else:
+            self.donations.append(amount)
+
+    def generate_letter(self):
+        """
+        Generates a Thank You letter to send to a donor. Uses the last value in their donations list to
+        mention their last donation amount.
+        :param donor: a donor dictionary entry
+        :return: string containing the text of the Thank You letter.
+        """
+        format_string = """
 Dear {first_name} {last_name},
 
    Thank you for your donation of ${last_donation:.2f}.
@@ -68,45 +92,18 @@ Dear {first_name} {last_name},
             Warmest Regards,
                 Local Charity
 """
-    amount = donor_data[donor][-1]
-    return format_string.format(last_donation=float(amount), first_name=donor.first, last_name=donor.last)
+        amount = self.donations[-1]
+        return format_string.format(last_donation=float(amount), first_name=self.first, last_name=self.last)
 
 
-def send_letters_all():
-    """
-        Runs through donor data structure, generates a thank you letter for each and saves it to
-        the current working directory with in a date+donorname.txt file
-        :return: None
-        """
-    for donor in donor_data:
-        print(f'Generating letter for {get_donor_fullname(donor)}')
-        now = time.localtime()
-        f_name = f"{now.tm_year}{now.tm_mon:02}{now.tm_mday:02}_"
-        f_name += get_donor_fullname(donor).replace(" ", "_") + ".txt"
-        with open(f_name, 'w') as file_out:
-            file_out.write(generate_letter(donor))
-    return None
 
 
-def get_donor(fullname):
-    '''
-    Given a text string with a donor's full name, determines if it is in data, new, or invalid.
-    If new, creates new donor entry in donor_data, with an empty donation list.
-    :param fullname: string, full name of a donor
-    :return: Donor object, or None
-    '''
-    name_sp = fullname.split()
-    if len(name_sp) == 0:
-        return None
-    elif len(name_sp) > 1:
-        donor = Donor(name_sp[0], ' '.join(name_sp[1:]))  # Defines first name up to the first space given
-    else:
-        donor = Donor(first='', last=name_sp[0])
 
-    if donor not in donor_data:
-        donor_data[donor] = []
 
-    return donor
+
+
+
+
 
 
 def send_thank_you():
@@ -145,30 +142,53 @@ def send_thank_you():
     print(generate_letter(donor))
 
 
-def print_report():
+def menu(menu_data):
     """
-    Prints a formatted report on the donors with name, amount given, number of gifts, and average gift.
-    :return: None
+    Prints the main user menu & retrieves user selection.
+    :param: a menu list, consisting of tuples with two values:
+        [0]: text to be presented to user
+        [1]: function that should be called for the menu item
+    :return: the function corresponding to the user's selection, or None on a bad selection
+        raises ValueError if choice is non-numeric
     """
-    # Find longest name in donor list, or use name_min value
-    name_min = 25
-    name_max = max(*[len(get_donor_fullname(donor)) for donor in donor_data], name_min)
+    print("\nPlease choose one of the following options:")
 
-    rpt_title = "Donor Name" + ' ' * (name_max - 9) + "| Total Given | Num Gifts | Average Gift"
-    print(rpt_title)
-    print("-" * len(rpt_title))
-    for donor in donor_data.keys():
-        dons = donor_data[donor]
-        print(f"{get_donor_fullname(donor):{name_max}}  ", end='')
-        print(f"$ {sum(dons):>10.2f}   {len(dons):>9}  ${sum(dons)/len(dons):>12.2f}")
+    for index, menu_item in enumerate(menu_data):   # Prints the menu user text
+        print(f"{index + 1}) {menu_item[0]}")
+
+    choice = int(input("> ")) - 1
+
+    if choice in range(len(menu_data)):             # Ensure that option chosen is within menu range
+        return menu_data[choice][1]                 # this handles choosing 0, which would return menu_data[-1][1]
+
+    return None
+
 
 
 if __name__ == "__main__":
 
+    # Global data structure
+    donor_data = (
+        ('Al Donor1', [10.00, 20.00, 30.00, 40.00, 50.00]),
+        ('Bert Donor2' ,[10.00]),
+        ('Connie Donor3', [10.00, 10.00, 10.01]),
+        ('Dennis Donor4', [10.00, 20.00, 20.00]),
+        ('Egbert Donor5', [10.39, 20.21, 10.59, 4000.40])
+    )
+
+    dl = Donors()
+    for name, dons in donor_data:
+        n = Donor(name)
+        dl.add_donor(n)
+        for d in dons:
+            n.donations.append(d)
+
+    dl.print_report()
+
     menu_functions = [
         ('Send a Thank You', send_thank_you),
-        ('Print a report', print_report),
-        ('Send letters to everyone', send_letters_all),
+        ('Print a report', dl.print_report),
+        ('Send letters to everyone', dl.send_letters_all),
         ('Quit', quit),
     ]
     while True:
