@@ -103,10 +103,13 @@ class Donors(object):
         return donor_str in [donor.name for donor in self._donors]
 
     def get_donor(self, name):
-        """Return a donor object for the given name, name is a str."""
+        """Given a name (str), return the donor object, or raise ValueError."""
         for donor in self._donors:
             if donor.name == name:
                 return donor
+        else:
+            print(self._donors)  # Remove this later
+            raise ValueError("No such donor exists")
 
     def append(self, donor):
         """Append a donor object to the list of donors."""
@@ -159,8 +162,8 @@ class StartMenu(object):
 
     def __init__(self, donors):
         """Instantiate a StartMenu class object with a Donors class object."""
-        self._donors = donors
-        self.menu_selection(self.main_prompt(), self.main_dispatch())
+        self.donors = donors
+        self.menu_selection(self.main_menu_prompt(), self.main_menu_dispatch())
 
     # MANAGING MENUS
     # Template for dispatch dicts
@@ -180,15 +183,15 @@ class StartMenu(object):
         return "exit menu"
 
     # Main menu
-    def main_dispatch(self):
+    def main_menu_dispatch(self):
         """Return a dispatch dict for the main menu."""
-        return {"1": self.send_thank_you_interaction,
-                "2": self._donors.create_report,
-                "3": self.send_all_menu,
+        return {"1": self.send_thank_you_sub_menu,
+                "2": self.donors.create_report,
+                "3": self.send_all_sub_menu,
                 "0": self.quit,
                 }
 
-    def main_prompt(self):
+    def main_menu_prompt(self):
         """Return a prompt str for the main menu."""
         return ("\nMain Menu\n"
                 "\n1 - Send a Thank You\n"
@@ -199,21 +202,21 @@ class StartMenu(object):
                 )
 
     # Send-a-Thank-You Sub-Menu
-    def send_thank_you_interaction(self):
+    def send_thank_you_sub_menu(self):
         """Initiate the send-thank-you sub-menu."""
-        self.menu_selection(self.send_thanks_prompt(),
-                            self.send_thanks_dispatch()
+        self.menu_selection(self.send_thank_you_prompt(),
+                            self.send_thank_you_dispatch()
                             )
 
-    def send_thanks_dispatch(self):
+    def send_thank_you_dispatch(self):
         """Return a dispatch dict for the send-thank-you sub-menu."""
-        return {"1": self._donors.print_donor_names,
+        return {"1": self.donors.print_donor_names,
                 "2": self.new_donor_interaction,
                 "3": self.old_donor_interaction,
                 "0": self.quit,
                 }
 
-    def send_thanks_prompt(self):
+    def send_thank_you_prompt(self):
         """Return a prompt str for the send-thank-you sub-menu."""
         return ("\nSend-Thank-You Sub-Menu\n"
                 "\n1 - See the list of donors\n"
@@ -249,10 +252,17 @@ class StartMenu(object):
                     print("Input must not be negative")
                     # continue
                 else:
-                    if name in donors:
-                        donors.get_donor(name).add_donation(donation_amount)
+                    # if name in self.donors:
+                    #     self.donors.get_donor(name).add_donation(donation_amount)
+                    # else:
+                    #     self.donors.append(SingleDonor(name, donation_amount))
+                    # return True
+                    try:
+                        donor = self.donors.get_donor(name)
+                    except ValueError:
+                        self.donors.append(SingleDonor(name, donation_amount))
                     else:
-                        donors.append(SingleDonor(name, donation_amount))
+                        donor.add_donation(donation_amount)
                     return True
 
     def new_donor_interaction(self):
@@ -276,7 +286,7 @@ class StartMenu(object):
         prompt_name = "Type the donor's full name or 0 to abort > "
         if old:
             name = ""
-            while name not in donors:
+            while name not in self.donors:
                 name = input(prompt_name)
                 if name == "0":
                     return
@@ -287,24 +297,24 @@ class StartMenu(object):
 
         if self.input_donation(name):
             print(self.get_email(name,
-                                 donors.get_donor(name).get_last_donation()
+                                 self.donors.get_donor(name).get_last_donation()
                                  )
                   )
 
     #  Send-letters-to-everyone Sub-Menu - Writing to files
-    def send_all_menu(self):
+    def send_all_sub_menu(self):
         """Initiate the send-all-letters sub-sub-menu."""
-        self.menu_selection(self.write_file_prompt(),
-                            self.write_file_dispatch())
+        self.menu_selection(self.send_all_prompt(),
+                            self.send_all_dispatch())
 
-    def write_file_dispatch(self):
+    def send_all_dispatch(self):
         """Return a dispatch dict for the send-to-everyone sub-menu."""
         return {"1": self.write_cwd,
                 "2": self.write_select_dir,
                 "0": self.quit,
                 }
 
-    def write_file_prompt(self):
+    def send_all_prompt(self):
         """Return a prompt str for the send-to-everyone sub-menu."""
         return ("\nSend to everyone sub-menu\n"
                 "\n1 - Write to current working directory\n"
@@ -328,7 +338,7 @@ class StartMenu(object):
     def write_cwd(self):
         """Write all emails to the current working directory."""
         cwd = os.getcwd()
-        for donor in self._donors:
+        for donor in self.donors:
             text = self.get_email(donor.name,
                                   donor.get_last_donation()
                                   )
@@ -347,7 +357,7 @@ class StartMenu(object):
         target_dir = self.ask_user_dir()
         if not target_dir:  # If the user hits cancel.
             return
-        for donor in self._donors:
+        for donor in self.donors:
             text = self.get_email(donor.name, donor.get_last_donation())
             self.write_file(self.get_full_path(target_dir, donor.name), text)
 
