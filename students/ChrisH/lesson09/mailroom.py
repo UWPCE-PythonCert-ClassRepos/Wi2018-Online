@@ -5,6 +5,7 @@
 # -----------------------------------------------------------
 
 import time
+from sys import exit
 
 
 class Donors(object):
@@ -46,6 +47,26 @@ class Donors(object):
                 file_out.write(donor.generate_letter())
         return None
 
+    @property
+    def list_donors(self):
+        return [donor.name for donor in self.donorlist]
+
+    @property
+    def count(self):
+        return len(self.donorlist)
+
+    def get_donor(self, dname):
+        if dname == "":
+            return None
+
+        for donor in self.donorlist:
+            if donor.name == dname:
+                return donor
+
+        newdonor = Donor(dname)
+        self.add_donor(newdonor)
+        return newdonor
+
 
 class Donor(object):
 
@@ -59,7 +80,7 @@ class Donor(object):
     def first(self):
         name_sp = self.name.split()
         if len(name_sp) == 1:
-            return None
+            return ''
         else:
             return name_sp[0]
 
@@ -77,6 +98,13 @@ class Donor(object):
         else:
             self.donations.append(amount)
 
+    @property
+    def last_donation(self):
+        if not self.donations:
+            return None
+        else:
+            return self.donations[-1]
+
     def generate_letter(self):
         """
         Generates a Thank You letter to send to a donor. Uses the last value in their donations list to
@@ -92,21 +120,14 @@ Dear {first_name} {last_name},
             Warmest Regards,
                 Local Charity
 """
-        amount = self.donations[-1]
-        return format_string.format(last_donation=float(amount), first_name=self.first, last_name=self.last)
+        return format_string.format(
+            last_donation=float(self.last_donation),
+            first_name=self.first,
+            last_name=self.last
+        )
 
 
-
-
-
-
-
-
-
-
-
-
-def send_thank_you():
+def send_thank_you_menu(dlist):
     """
     Prompts for donor name, if not present, adds user to data. Prompts for donation
     and adds it to donor's data. Prints a 'Thank You' email populated with the donor's data.
@@ -118,10 +139,10 @@ def send_thank_you():
         if name == 'q':
             return
         elif name == 'list':
-            print(("{}\n" * len(donor_data)).format(*([get_donor_fullname(d) for d in donor_data])))
+            print(("{}\n" * dlist.count).format(*dlist.list_donors))
             continue
         else:
-            donor = get_donor(name)
+            donor = dlist.get_donor(name)
             if not donor:
                 print("Name cannot be empty.")
                 continue
@@ -130,26 +151,29 @@ def send_thank_you():
 
     while True:
         try:
-            amount = input("Enter a donation amount for {} : ".format(get_donor_fullname(donor)))
-            if float(amount) <= 0:
+            amount = float(input(f"Enter a donation amount for {donor.name} : "))
+            if amount <= 0:
                 print('Amount donated must be a positive number.')
             else:
                 break
         except ValueError:
             print('Please enter a numerical value.')
 
-    donor_data[donor].append(float(amount))
-    print(generate_letter(donor))
+    donor.add_donation(amount)
+    print(donor.generate_letter())
 
 
 def menu(menu_data):
     """
     Prints the main user menu & retrieves user selection.
-    :param: a menu list, consisting of tuples with two values:
+    :param: a menu list, consisting of tuples with three values:
         [0]: text to be presented to user
         [1]: function that should be called for the menu item
-    :return: the function corresponding to the user's selection, or None on a bad selection
+        [2]: parameter that should be used in the function call, None if no parameter call needed
+    :return: two values:
+        1) the function corresponding to the user's selection, or None on a bad selection
         raises ValueError if choice is non-numeric
+        2) a parameter that should be used with the fn call, None if no parameter needed
     """
     print("\nPlease choose one of the following options:")
 
@@ -158,11 +182,10 @@ def menu(menu_data):
 
     choice = int(input("> ")) - 1
 
-    if choice in range(len(menu_data)):             # Ensure that option chosen is within menu range
-        return menu_data[choice][1]                 # this handles choosing 0, which would return menu_data[-1][1]
+    if choice in range(len(menu_data)):                     # Ensure that option chosen is within menu range, this
+        return menu_data[choice][1], menu_data[choice][2]   # handles choosing 0, which would return menu_data[-1][1]
 
     return None
-
 
 
 if __name__ == "__main__":
@@ -186,14 +209,18 @@ if __name__ == "__main__":
     dl.print_report()
 
     menu_functions = [
-        ('Send a Thank You', send_thank_you),
-        ('Print a report', dl.print_report),
-        ('Send letters to everyone', dl.send_letters_all),
-        ('Quit', quit),
+        ('Send a Thank You', send_thank_you_menu, dl),
+        ('Print a report', dl.print_report, None),
+        ('Send letters to everyone', dl.send_letters_all, None),
+        ('Quit', exit, None),
     ]
     while True:
         try:
-            menu(menu_functions)()
+            fn, param = menu(menu_functions)
+            if param:
+                fn(param)
+            else:
+                fn()
         except TypeError:
             continue
         except ValueError:
