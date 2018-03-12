@@ -6,9 +6,12 @@
 
 import time
 from sys import exit
+import pickle
 
 
 class Donors(object):
+
+    DATA_FILE = 'donors.pkl'
 
     def __init__(self):
         self.donorlist = []
@@ -67,6 +70,13 @@ class Donors(object):
         self.add_donor(newdonor)
         return newdonor
 
+    def load_donorlist(self):
+        with open(self.DATA_FILE, 'rb') as file_in:
+            self.donorlist = pickle.load(file_in)
+
+    def save_donorlist(self):
+        with open(self.DATA_FILE, 'wb') as file_out:
+            pickle.dump(self.donorlist, file_out)
 
 class Donor(object):
 
@@ -190,28 +200,14 @@ def menu(menu_data):
 
 if __name__ == "__main__":
 
-    # Global data structure
-    donor_data = (
-        ('Al Donor1', [10.00, 20.00, 30.00, 40.00, 50.00]),
-        ('Bert Donor2' ,[10.00]),
-        ('Connie Donor3', [10.00, 10.00, 10.01]),
-        ('Dennis Donor4', [10.00, 20.00, 20.00]),
-        ('Egbert Donor5', [10.39, 20.21, 10.59, 4000.40])
-    )
-
     dl = Donors()
-    for name, dons in donor_data:
-        n = Donor(name)
-        dl.add_donor(n)
-        for d in dons:
-            n.donations.append(d)
-
-    dl.print_report()
 
     menu_functions = [
         ('Send a Thank You', send_thank_you_menu, dl),
         ('Print a report', dl.print_report, None),
         ('Send letters to everyone', dl.send_letters_all, None),
+        ('Load donor list', dl.load_donorlist, None),
+        ('Save donor list', dl.save_donorlist, None),
         ('Quit', exit, None),
     ]
     while True:
