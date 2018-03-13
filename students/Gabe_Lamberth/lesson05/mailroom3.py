@@ -69,7 +69,7 @@ def add_donor():
                 name = f'{first} {last}'.title()
                 if name in patrons.keys():
                     print("Donor's name already exists")
-                    add_donor()
+                    continue
                 else:
                     patrons[name] = []
                 try:
