@@ -80,6 +80,7 @@ class Donors(object):
             pickle.dump(self.donorlist, file_out)
         return self.count
 
+
 class Donor(object):
 
     def __init__(self, name):
