@@ -53,17 +53,29 @@ for fruit in fruit_list:
     response = input("Do you like " + fruit + "? Please answer YES or NO > ")	#get response from user to modify the list
     response = response.lower()
     print(response)
-    print(type(response))
-    while response == "yes" or "no":
-        if response == "no":
-            fruit_list.remove(fruit)
-            print(fruit + " has been removed from the list")
-        else:
-            print("I like " + fruit + " too.")
-    else:
+    while not (response.lower() == "yes" or response.lower() == "no"):
          response = input("Please answer YES or NO > ")	#get response from user to modify the list
+    if response == "no":
+        fruit_list.remove(fruit)
+        print(fruit + " has been removed from the list")
+    else:
+        print("I like " + fruit + " too.")
 print("Here is a list of your favorite fruits.")
 print(fruit_list)
+
+"""Fruit List Series four"""
+new_fruit_list = []
+for fruit in fruit_list:
+    new_fruit = (fruit[::-1]).lower()
+    new_fruit_list.append(new_fruit)
+fruit_list.remove(fruit_list[-1])
+print("The last item in the original fruit list has been removed:")
+print(fruit_list)
+print("The new list is:")
+print(new_fruit_list)
+
+
+
 
 
 
