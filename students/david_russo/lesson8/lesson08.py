@@ -1,10 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Mar  5 19:39:36 2018
-
-@author: du060e
-"""
 
 import math
 from functools import total_ordering

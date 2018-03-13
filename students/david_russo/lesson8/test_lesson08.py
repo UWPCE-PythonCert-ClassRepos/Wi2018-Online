@@ -1,10 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Mar  5 19:40:00 2018
-
-@author: du060e
-"""
 
 import lesson08 as l8
 import unittest
