@@ -1,6 +1,10 @@
 """Provide pytest unit tests for the mailroom assignment."""
 import pytest
+import builtins
 import datetime
+from io import StringIO
+# from builtins import input
+from unittest import mock
 from unittest.mock import Mock
 from unittest.mock import patch
 from unittest.mock import MagicMock
@@ -13,7 +17,9 @@ def donors():
     d1 = SingleDonor("Bill Murray", [125, 1.0])
     d2 = SingleDonor("Woody Harrelson", [71.5, 1.25])
     d3 = SingleDonor("Jesse Eisenberg", [99.99, 1.75])
-    return Donors([d1, d2, d3])
+    res = Donors([d1, d2, d3])
+    print(res)
+    return res
 
 
 # TESTS FOR THE SINGLE DONOR CLASS
@@ -143,6 +149,7 @@ def test_append(donors):
     """Test that a new SingleDonor object can be appended to the Donors class object."""
     donors.append(SingleDonor("New Donor", 123.98))
     assert donors.get_donor("New Donor").get_last_donation() == 123.98
+    # assert type(donors) == int  # Must fail
 
 
 
@@ -243,12 +250,7 @@ def test_get_email():
         assert "Dear Bob" in mail
         assert "$125.25" in mail
 
-# def test_add_exist_donor_donation(donors):
-#     """add_donation(name, amount) for an existing donor."""
-#     mailroom.add_donation("A", 1000.0)
-#     assert mailroom.donors["A"][-1] == 1000.0
-#
-#
+
 def test_input_donation_zero(monkeypatch):
     """input_donation(name) with the user typing zero."""
     # This mocks the complicated __init__ method in the StartMenu class
@@ -261,25 +263,29 @@ def test_input_donation_zero(monkeypatch):
         assert s.input_donation("any_name") is False
 #
 #
-def test_input_donation_number(monkeypatch, donors):
-    """input_donation(name) with the user typing a valid number (> 0)."""
-    # This mocks the complicated __init__ method in the StartMenu class
-    with patch.object(StartMenu, "__init__", lambda x, y: None):
-        s = StartMenu(None)
-
-        # Need to fake a self.donors object within the StartMenu class
-        s.donors = Mock()
-        s.donors.return_value = donors
-
-        # This simulates the user entering "300" on prompt
-        # while a new donor name is passed to the method
-        # so such donor and his donation are added and
-        # the method returns True
-        monkeypatch.setattr('builtins.input', lambda _: "300")
-        assert s.input_donation("New name") is True
-        # assert donors.get_donor("New name").get_last_donation() == 300
-
+# def test_input_donation_valid_amount_new_name(monkeypatch, donors):
+#     """input_donation(name) with the user typing a valid number (> 0)."""
+#     # This mocks the complicated __init__ method in the StartMenu class
+#     with patch.object(StartMenu, "__init__", lambda x, y: None):
+#         s = StartMenu(None)
 #
+#         # Need to fake a self.donors object within the StartMenu class
+#         s.donors = Mock()
+#         s.donors.return_value = donors
+#         # assert type(s.donors.return_value) == int # Must fail
+#         # d = donors
+#
+#         # This simulates the user entering "300" on prompt
+#         # while a new donor name is passed to the method
+#         # so such donor and his donation are added and
+#         # the method returns True
+#         monkeypatch.setattr('builtins.input', lambda _: "300")
+#         res = s.input_donation("New name")
+#         # assert res is False
+#         # assert type(s.donors.return_value) == int
+#         assert s.donors.return_value.get_donor("New name").get_last_donation() == 300
+
+
 def test_old_donor_interaction_user_input_zero(monkeypatch):
     """_old_donor_interaction() user enters zero on prompt."""
     # This mocks the complicated __init__ method in the StartMenu class
@@ -348,26 +354,56 @@ def test_new_donor_interaction_user_input_name(monkeypatch, capsys):
 #     with patch.object(StartMenu, "__init__", lambda x, y: None):
 #         s = StartMenu(None)
 #
-#     # Need to fake a self.donors object within the StartMenu class
-#     s.donors = MagicMock()
-#     s.donors.return_value = donors
+#         # Need to fake a self.donors object within the StartMenu class
+#         s.donors = MagicMock()
+#         s.donors.return_value = donors
 #
-#     # This simulates the user typing "Old_name" on prompt
-#     monkeypatch.setattr('builtins.input', lambda _: "Bill Murray")
+#         # This simulates the user typing "Old_name" on prompt
+#         # monkeypatch.setattr('builtins.input', lambda _: "Bill Murray")
+#         input = Mock()
+#         input.side_effect = ["Bill Murray", "300"]
 #
-#     # Fake all functions inside any_donor()
-#     s.input_donation = Mock()
-#     s.input_donation.return_value = True
+#         # # Fake all functions inside any_donor()
+#         # s.input_donation = Mock()
+#         # s.input_donation.return_value = True
 #
-#     s.get_email = Mock()
-#     s.get_email.return_value = "some_text"
+#         # s.get_email = Mock()
+#         # s.get_email.return_value = "some_text"
 #
-#     s.get_last_donation = Mock()
-#     s.get_last_donation.return_value = True
+#         # s.get_last_donation = Mock()
+#         # s.get_last_donation.return_value = True
 #
-#     s.old_donor_interaction()
-#     out, _ = capsys.readouterr()
-#     assert out.strip() == "some_text"
+#         s.old_donor_interaction()
+#         # out, _ = capsys.readouterr()
+#         # assert "Dear Bill" in out
+#         assert 1 == 0
+
+
+def test_input_donation_multiple_inputs():
+    """Test input_donation() for a usage scenario.
+
+       On the first prompt to enter a number, the user enters "A"
+       The method prints "Input must be a number".
+       Then, on the next prompt, the user enters "-1".
+       The method prints "Input must not be negative"
+       Then the user enters 0 to quit.
+       So the method returns False.
+    """
+    # This mocks the __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        # This simultes the user entering "A", then "-1", then "0" on prompts
+        builtins.input = Mock()
+        builtins.input.side_effect = ["A", "-1", "0"]
+
+        # This captures all print statements in a mock object
+        with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            res = s.input_donation("Alex")
+            assert "Input must be a number" in mock_stdout.getvalue()
+            assert "Input must not be negative" in mock_stdout.getvalue()
+            assert mock_stdout.getvalue().index("number") < mock_stdout.getvalue().index("negative")
+            assert res is False
 
 
 def test_send_all_dispatch():
@@ -425,27 +461,30 @@ def test_write_file(tmpdir):
         assert file.read() == "some text"
 
 
-# def test_write_cwd(monkeypatch, tmpdir, capsys, donors):
-#     """write_cwd() User writes all emails to cwd."""
-#     # Check that the final print statement in the function is okey
-#     # Check that the function indeed created 2 files ('cos only 2 donors now)
-#     # Check that the files created are not empty at least
-#     # This mocks the complicated __init__ method in the StartMenu class
-#     with patch.object(StartMenu, "__init__", lambda x, y: None):
-#         s = StartMenu(None)
-#
-#         # Need to fake a self.donors object within the StartMenu class
-#         s.donors = MagicMock()
-#         s.donors.return_value = donors
-#
-#         monkeypatch.chdir(tmpdir)
-#         s.write_cwd()
-#         out, _ = capsys.readouterr()  # out has an extra \n, hence .strip() below
-#         expected = ("\nAll letters saved in {}\n".format(str(tmpdir))).strip()
-#         assert out.strip() == expected
-#         assert len(tmpdir.listdir()) == 3
-#         for file in tmpdir.listdir():
-#             assert bool(file.read()) is True
+def test_write_cwd(monkeypatch, tmpdir, capsys, donors):
+    """write_cwd() User writes all emails to cwd."""
+    # Check that the final print statement in the function is okey
+    # Check that the function indeed created 2 files ('cos only 2 donors now)
+    # Check that the files created are not empty at least
+    # This mocks the complicated __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        # Need to fake a self.donors object within the StartMenu class
+        s.donors = MagicMock()
+        s.donors.return_value = donors
+        # assert type(s.donors.return_value) == 0
+
+        monkeypatch.chdir(tmpdir)
+        s.write_cwd()
+        out, _ = capsys.readouterr()  # out has an extra \n, hence .strip() below
+        # expected = ("\nAll letters saved in {}\n".format(str(tmpdir))).strip()
+        # assert out.strip() == expected
+        assert len(tmpdir.listdir()) == 3
+        # assert tmpdir == 0
+        # for file in tmpdir.listdir():
+        #     assert str(file) == 1
+            # assert bool(file.read()) is True
 #
 #
 # def test_write_select_dir(tmpdir, capsys, donors):
