@@ -96,6 +96,17 @@ TestDATA2                  $       6.00           3  $        2.00
                 donorname = (filename[9:-4]).replace("_", " ")
                 self.assertIn(donorname, self.dl.list_donors)
 
+    def test_donor_init(self):
+        with self.assertRaises(ValueError):
+            mailroom.Donor('')
+
+    def test_donor_last_donation(self):
+        c = mailroom.Donor('test')
+        self.assertEqual(c.last_donation, None)
+        with self.assertRaises(ValueError):
+            c.add_donation(-100)
+        c.add_donation(100)
+        self.assertEqual(c.last_donation, 100.0)
 
 if __name__ == "__main__":
    unittest.main()
