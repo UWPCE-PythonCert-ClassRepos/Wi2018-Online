@@ -16,6 +16,7 @@ class Element(object):
         if content is None:
             self.content = []
         else:
+            if isinstance(content, SelfClosingTag): raise TypeError
             self.content = [content]
         self.kwarg_dict = kwargs
 
@@ -70,3 +71,18 @@ class OneLineTag(Element):
 
 class Title(OneLineTag):
     tag = "title"
+
+
+class SelfClosingTag(Element):
+    tag = ""
+
+    def render(self, file_out, cur_ind=""):
+        if self.tag: file_out.write("<" + self.tag + " />\n")
+
+
+class Hr(SelfClosingTag):
+    tag = "hr"
+
+
+class Br(SelfClosingTag):
+    tag = "br"
