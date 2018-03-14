@@ -21,25 +21,44 @@ class Element(object):
     def append(self, append_text):
         self.content.append(append_text)
 
-    def render(self, file_out="", cur_ind=" "):
+    def render(self, file_out, cur_ind=""):
         if self.tag: file_out.write("<" + self.tag + ">\n")
         for element in self.content:
-            if element is str:
-                file_out.write(cur_ind + element + "\n")
-            else:
-                file_out.write(cur_ind + element.render(file_out, cur_ind) + "\n")
-        if self.tag: file_out.write("</" + self.tag + ">")
+            try:
+                element.render(file_out, "")
+            except AttributeError:
+                file_out.write(cur_ind + str(element) + "\n")
+        if self.tag: file_out.write("</" + self.tag + ">\n")
         return file_out
 
 
 class Html(Element):
-
     tag = "html"
 
-class Body(Element):
 
+class Body(Element):
     tag = "body"
 
-class P(Element):
 
+class P(Element):
     tag = "p"
+
+
+class Head(Element):
+    tag = "head"
+
+
+class OneLineTag(Element):
+    def render(self, file_out, cur_ind=""):
+        if self.tag: file_out.write("<" + self.tag + "> ")
+        for element in self.content:
+            try:
+                element.render(file_out, "")
+            except AttributeError:
+                file_out.write(cur_ind + str(element))
+        if self.tag: file_out.write(" </" + self.tag + ">\n")
+        return file_out
+
+
+class Title(OneLineTag):
+    tag = "title"

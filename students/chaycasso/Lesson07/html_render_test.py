@@ -23,9 +23,72 @@ class htmltest(unittest.TestCase):
             e.render(outfile, cur_ind="")
         with open("outfile.html", "r") as infile:
             content = infile.read()
-            assert content == "<html>\n1\n</html>"
+            assert content == "1\n"
 
-    def
+    def test_render_html(self):
+        """Test that render renders html tag."""
+        e = hr.Html("1")
+        with open("outfile.html", "w") as outfile:
+            e.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == "<html>\n1\n</html>\n"
+
+    def test_render_body(self):
+        """Test that render renders body tag."""
+        e = hr.Body("1")
+        e.append("2")
+        with open("outfile.html", "w") as outfile:
+            e.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == "<body>\n1\n2\n</body>\n"
+
+    def test_render_p(self):
+        """Test that render renders p tag."""
+        e = hr.P("1")
+        e.append("2")
+        with open("outfile.html", "w") as outfile:
+            e.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == "<p>\n1\n2\n</p>\n"
+
+    def test_render_body_2(self):
+        """Test that render renders paragraph appended inside body."""
+        e = hr.Body("1")
+        e.append(hr.P("2"))
+        with open("outfile.html", "w") as outfile:
+            e.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == """<body>
+1
+<p>
+2
+</p>
+</body>
+"""
+
+    def test_render_head(self):
+        """Test that render renders head tag."""
+        e = hr.Head("1")
+        e.append("2")
+        with open("outfile.html", "w") as outfile:
+            e.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == "<head>\n1\n2\n</head>\n"
+
+    def test_title(self):
+        """Test that renders single line title."""
+        e = hr.Title("1")
+        e.append("2")
+        with open("outfile2.html", "w") as outfile:
+            e.render(outfile, cur_ind="")
+        with open("outfile2.html", "r") as infile:
+            content = infile.read()
+            assert content == "<title> 12 </title>\n"
 
 if __name__ == '__main__':
     unittest.main()
