@@ -30,14 +30,30 @@ class Element(object):
                 print(key, self.kwarg_dict[key])
                 file_out.write(key + '="' + self.kwarg_dict[key] + '"')
             file_out.write(">\n")
+
+        # If this is a member of SelfClosingTag, we want only limited functionality.
+        elif isinstance(self, SelfClosingTag):
+            if self.tag: file_out.write("<" + self.tag + " />\n")
+            return file_out
+        # If this is a member of OneLineTag, we don't want any carriage returns.
+        elif isinstance(self, OneLineTag):
+            file_out.write("<" + self.tag + "> ")
         elif self.tag:
             file_out.write("<" + self.tag + ">\n")
+
         for element in self.content:
             try:
                 element.render(file_out, "")
             except AttributeError:
-                file_out.write(cur_ind + str(element) + "\n")
-        if self.tag: file_out.write("</" + self.tag + ">\n")
+                if isinstance(self, OneLineTag):
+                    file_out.write(cur_ind + str(element))
+                else:
+                    file_out.write(cur_ind + str(element) + "\n")
+
+        if isinstance(self, OneLineTag):
+            file_out.write(" </" + self.tag + ">\n")
+        elif self.tag:
+            file_out.write("</" + self.tag + ">\n")
         return file_out
 
 
@@ -58,15 +74,7 @@ class Head(Element):
 
 
 class OneLineTag(Element):
-    def render(self, file_out, cur_ind=""):
-        if self.tag: file_out.write("<" + self.tag + "> ")
-        for element in self.content:
-            try:
-                element.render(file_out, "")
-            except AttributeError:
-                file_out.write(cur_ind + str(element))
-        if self.tag: file_out.write(" </" + self.tag + ">\n")
-        return file_out
+    tag = ""
 
 
 class Title(OneLineTag):
@@ -75,9 +83,6 @@ class Title(OneLineTag):
 
 class SelfClosingTag(Element):
     tag = ""
-
-    def render(self, file_out, cur_ind=""):
-        if self.tag: file_out.write("<" + self.tag + " />\n")
 
 
 class Hr(SelfClosingTag):
