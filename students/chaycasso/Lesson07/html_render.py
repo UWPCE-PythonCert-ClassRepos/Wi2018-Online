@@ -11,18 +11,26 @@ class Element(object):
     indent = ""
     tag = ""
 
-    def __init__(self, content=None):
+    def __init__(self, content=None, **kwargs):
         """Creates Element content value."""
         if content is None:
             self.content = []
         else:
             self.content = [content]
+        self.kwarg_dict = kwargs
 
     def append(self, append_text):
         self.content.append(append_text)
 
     def render(self, file_out, cur_ind=""):
-        if self.tag: file_out.write("<" + self.tag + ">\n")
+        if self.kwarg_dict:
+            file_out.write("<" + self.tag + " ")
+            for key in self.kwarg_dict:
+                print(key, self.kwarg_dict[key])
+                file_out.write(key + '="' + self.kwarg_dict[key] + '"')
+            file_out.write(">\n")
+        elif self.tag:
+            file_out.write("<" + self.tag + ">\n")
         for element in self.content:
             try:
                 element.render(file_out, "")

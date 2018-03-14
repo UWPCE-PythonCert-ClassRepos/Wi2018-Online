@@ -84,11 +84,29 @@ class htmltest(unittest.TestCase):
         """Test that renders single line title."""
         e = hr.Title("1")
         e.append("2")
-        with open("outfile2.html", "w") as outfile:
+        with open("outfile.html", "w") as outfile:
             e.render(outfile, cur_ind="")
-        with open("outfile2.html", "r") as infile:
+        with open("outfile.html", "r") as infile:
             content = infile.read()
             assert content == "<title> 12 </title>\n"
+
+    def test_attributes(self):
+        """Test that renders title with extended attributes."""
+        body = hr.Body()
+        body.append(hr.P("Here is a paragraph of text -- there could be more of them, "
+                         "but this is enough  to show that we can do some text",
+                         style="text-align: center; font-style: oblique;"))
+        with open("outfile3.html", "w") as outfile:
+            body.render(outfile, cur_ind="")
+        with open("outfile3.html", "r") as infile:
+            content = infile.read()
+            assert content == '''<body>
+<p style="text-align: center; font-style: oblique;">
+Here is a paragraph of text -- there could be more of them, but this is enough  to show that we can do some text
+</p>
+</body>
+'''
+
 
 if __name__ == '__main__':
     unittest.main()
