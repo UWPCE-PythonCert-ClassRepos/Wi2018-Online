@@ -37,7 +37,7 @@ class SingleDonor(object):
 
     @property
     def donations(self):
-        """Provide a getter method for the name property."""
+        """Provide a getter method for the donations property."""
         return self._donations
 
     @staticmethod
@@ -108,7 +108,6 @@ class Donors(object):
             if donor.name == name:
                 return donor
         else:
-            print(self._donors)  # Remove this later
             raise ValueError("No such donor exists")
 
     def append(self, donor):
@@ -244,22 +243,15 @@ class StartMenu(object):
                 donation_amount = float(input(prompt_amount))
             except ValueError:
                 print("Input must be a number")
-                # continue
             else:
                 if donation_amount == 0.0:
                     return False
                 elif donation_amount < 0:
                     print("Input must not be negative")
-                    # continue
                 else:
-                    # if name in self.donors:
-                    #     self.donors.get_donor(name).add_donation(donation_amount)
-                    # else:
-                    #     self.donors.append(SingleDonor(name, donation_amount))
-                    # return True
                     try:
                         donor = self.donors.get_donor(name)
-                    except ValueError:
+                    except ValueError:  # name is a new donor - create him
                         self.donors.append(SingleDonor(name, donation_amount))
                     else:
                         donor.add_donation(donation_amount)
@@ -278,7 +270,7 @@ class StartMenu(object):
         # which is not on the list of the old donors.
         # I didn't like this option because it'd be similar to creating a new
         # email account every time the user misspells his name when he logs in,
-        # if I may draw this analogy.
+        # if I may use this analogy.
         self.old_donor_interaction(old=False)
 
     def old_donor_interaction(self, old=True):
@@ -291,9 +283,14 @@ class StartMenu(object):
                 if name == "0":
                     return
         else:
-            name = input(prompt_name)
-            if name == "0":
-                return
+            while True:
+                name = input(prompt_name)
+                if name == "0":
+                    return False
+                elif name == "":
+                    print("Name must not be empty!")
+                else:
+                    break
 
         if self.input_donation(name):
             print(self.get_email(name,
@@ -364,7 +361,7 @@ class StartMenu(object):
         print("\nAll letters saved in {}\n".format(target_dir))
 
 
+# Load data and run
 if __name__ == "__main__":
-    # Load data and run
     donors = Donors([SingleDonor(name, data[name]) for name in data])
     StartMenu(donors)
