@@ -43,7 +43,28 @@ class Circle(object):
     def diameter(self, value):
         self.__radius = value / 2
 
-class from_diameter(Circle):
-    def __init__(self, diameter):
-        radius = diameter / 2
-        Circle.__init__(self, radius)
+    def __str__(self):
+        return f'Circle with radius({self.radius})'
+
+    def __repr__(self):
+        return 'Circle(%r)' % self.radius
+
+    def __add__(self, other):
+        return f'Adding two circles with radius {self.radius} and {other.radius} = ' + str(self.__radius + other.radius)
+
+    def __mul__(self, other):
+        return f'Multiply two circles with radius {self.radius} and {other.radius} = ' + str(self.__radius * other.radius)
+
+    def __lt__(self, other):
+        return self.__radius < other.radius
+
+    def __eq__(self, other):
+        return self.__radius== other.radius
+
+
+    # --Methods--
+    @classmethod
+    def from_diameter(cls, value):
+        radius = value / 2
+        return cls(radius)
+
