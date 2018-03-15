@@ -121,11 +121,37 @@ Here is a paragraph of text -- there could be more of them, but this is enough  
 
     def test_a(self):
         object = hr.A("http://google.com", "link")
+        with open("outfile.html", "w") as outfile:
+            object.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == '<a href="http://google.com">\nlink\n</a>\n'
+
+    def test_ul(self):
+        object = hr.Ul(id="TheList", style="line-height:200%")
+        with open("outfile.html", "w") as outfile:
+            object.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == '<ul id="TheList", style="line-height:200%">\n</ul>\n'
+
+    def test_li(self):
+        object = hr.Li("This is the second item", style="color: red")
+        with open("outfile.html", "w") as outfile:
+            object.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == '<li style="color: red">\nThis is the second item\n</li>\n'
+
+    def test_h(self):
+        object = hr.H(2, "PythonClass - Class 6 example")
         with open("outfile3.html", "w") as outfile:
             object.render(outfile, cur_ind="")
         with open("outfile3.html", "r") as infile:
             content = infile.read()
-            assert content == '<a href="http://google.com">\nlink\n</a>\n'
+            assert content == '<h2> PythonClass - Class 6 example </h2>\n'
+
+
 
 if __name__ == '__main__':
     unittest.main()

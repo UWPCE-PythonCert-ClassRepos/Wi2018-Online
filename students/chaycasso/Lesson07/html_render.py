@@ -26,9 +26,11 @@ class Element(object):
     def render(self, file_out, cur_ind=""):
         if self.kwarg_dict:
             file_out.write("<" + self.tag + " ")
+            kwarg_string = ""
             for key in self.kwarg_dict:
-                print(key, self.kwarg_dict[key])
-                file_out.write(key + '="' + self.kwarg_dict[key] + '"')
+                kwarg_string += (key + '="' + self.kwarg_dict[key] + '"' + ", ")
+            kwarg_string = kwarg_string[:-2]
+            file_out.write(kwarg_string)
             file_out.write(">\n")
 
         # If this is a member of SelfClosingTag, we want only limited functionality.
@@ -99,3 +101,20 @@ class A(Element):
 
     def __init__(self, link=None, content=None):
         super().__init__(content, **{"href": link})
+
+
+class Ul(Element):
+    """add unordered list"""
+    tag="ul"
+
+
+class Li(Element):
+    """add list item"""
+    tag="li"
+
+class H(OneLineTag):
+    """add header tag"""
+
+    def __init__(self, level=1, content=None):
+        self.tag = "h" + str(level)
+        super().__init__(content)
