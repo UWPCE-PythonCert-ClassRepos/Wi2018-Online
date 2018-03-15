@@ -13,8 +13,11 @@ class Donors(object):
 
     DATA_FILE = 'donors.pkl'
 
-    def __init__(self):
-        self.donorlist = []
+    def __init__(self, donorlist=None):
+        if donorlist:
+            self.donorlist = donorlist
+        else:
+            self.donorlist = []
 
     def add_donor(self, donor):
         self.donorlist.append(donor)
@@ -80,25 +83,20 @@ class Donors(object):
             pickle.dump(self.donorlist, file_out)
         return self.count
 
-    def challenge(self, multiplier):
-
-        newdonors = Donors()
-        for don in self.donorlist:
-            newdon = Donor(don.name)
-            newdon.donations = list(map(lambda x : x * 2, don.donations))
-            newdonors.add_donor(newdon)
-
-        return newdonors
-
+    def challenge(self, mul):
+        return Donors([(Donor(d.name, list(map(lambda x: x * mul, d.donations)))) for d in self.donorlist])
 
 
 class Donor(object):
 
-    def __init__(self, name):
+    def __init__(self, name, donations=None):
         if not name:
             raise ValueError("Donor name cannot be empty.")
         self.name = name
-        self.donations = []
+        if not donations:
+            self.donations = []
+        else:
+            self.donations = donations
 
     @property
     def first(self):
