@@ -91,3 +91,11 @@ class Hr(SelfClosingTag):
 
 class Br(SelfClosingTag):
     tag = "br"
+
+
+class A(Element):
+    """add hyperlink"""
+    tag = "a"
+
+    def __init__(self, link=None, content=None):
+        super().__init__(content, **{"href": link})

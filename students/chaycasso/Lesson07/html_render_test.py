@@ -84,9 +84,9 @@ class htmltest(unittest.TestCase):
         """Test that renders single line title."""
         object = hr.Title("1")
         object.append("2")
-        with open("outfile3.html", "w") as outfile:
+        with open("outfile.html", "w") as outfile:
             object.render(outfile, cur_ind="")
-        with open("outfile3.html", "r") as infile:
+        with open("outfile.html", "r") as infile:
             content = infile.read()
             assert content == "<title> 12 </title>\n"
 
@@ -119,6 +119,13 @@ Here is a paragraph of text -- there could be more of them, but this is enough  
     def test_bad_hrtag(self):
         self.assertRaises(TypeError, object=hr.Hr("Content"))
 
+    def test_a(self):
+        object = hr.A("http://google.com", "link")
+        with open("outfile3.html", "w") as outfile:
+            object.render(outfile, cur_ind="")
+        with open("outfile3.html", "r") as infile:
+            content = infile.read()
+            assert content == '<a href="http://google.com">\nlink\n</a>\n'
 
 if __name__ == '__main__':
     unittest.main()
