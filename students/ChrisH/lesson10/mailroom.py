@@ -95,7 +95,9 @@ class Donors(object):
         """
 
         # define the filter functions, based on if min or max values for donation multipliers were added
-        # unfortunately, PEP8 abhors assigning lambdas to variables, so here are some glorious Defs:
+        # unfortunately, PEP8 abhors assigning lambdas to variables, so here are some glorious Defs.
+        #  fi = donations that should be multiplied
+        #  not_fi = donations that should not be multiplied
         if min_don and max_don:
             def fi(x): return max_don >= x > min_don
 
@@ -115,6 +117,10 @@ class Donors(object):
 
             def not_fi(x): return False
 
+        # iterate the donorlist, apply filters to the list of donations for each donor, multiply the donations on only
+        #   one of the filters, add these two donation lists together, slap it together with the donors' name to create
+        #   a donor object. List comprehension makes a list of the new Donors, which is then used as an input to create
+        #   a new Donors() class object. 
         return Donors(
             [Donor(
                 donor.name,
