@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-# Week 5
-# Mailroom Assignment - Part 3
+# Week 6
+# Mailroom Assignment - Part 4
 #
 # Changelog:
 # - Added in the use of dictionaries
@@ -10,6 +10,8 @@
 # - Changed print_donor_list() to a list comprehension
 
 import sys
+
+# Global variables
 
 donors = {
     'Jimmy Nguyen': [100, 1350, 55],
@@ -24,8 +26,6 @@ def print_donor_list():
     """Function simply for looping through the donor list.
     Made into function since it may be called multiple times.
     """
-    # for donor in donors.keys():
-    #     print(donor)
 
     donor = [name for name in donors.keys()]
     return donor
@@ -33,7 +33,7 @@ def print_donor_list():
 
 def get_donor(name):
     """Get donor from the donors dictionary."""
-    donor = name.lower()
+    donor = name
     for k in donors.keys():
         if donor == k.strip().lower():
             return k
@@ -102,6 +102,11 @@ def create_report():
         print("{:26s} | {:14.2f} | {:15d} | {:13.2f}".format(*amount))
     print()
 
+    report_values = donors.values()
+
+    # print("\n\n")
+    # print(report_values)
+
 
 def letter(donor):
     """Contents of letter to donors."""
@@ -122,17 +127,12 @@ def send_letter_file():
     print('Completed creating letters to send out to donors.')
 
 
-def quit():
-    """This function quits the donation management system."""
-    return sys.exit('Exiting the system. Please wait...')
-
-
 def print_header():
     """Prints the menu items to choose from and returns the selection."""
 
     print('------------------------------------------')
     print('       Donation Management System')
-    print('                 v0.1.3\n')
+    print('                 v0.1.4\n')
     print('       1: Send A Thank You')
     print('       2: Create A Report')
     print('       3: Send Letters To Everyone')
@@ -152,7 +152,8 @@ switcher = {
     1: thank_you,
     2: create_report,
     3: send_letter_file,
-    4: quit}
+    4: sys.exit
+}
 
 
 def main():
@@ -169,3 +170,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    # print(quit())
