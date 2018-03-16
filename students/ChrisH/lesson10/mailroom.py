@@ -120,7 +120,7 @@ class Donors(object):
         # iterate the donorlist, apply filters to the list of donations for each donor, multiply the donations on only
         #   one of the filters, add these two donation lists together, slap it together with the donors' name to create
         #   a donor object. List comprehension makes a list of the new Donors, which is then used as an input to create
-        #   a new Donors() class object. 
+        #   a new Donors() class object.
         return Donors(
             [Donor(
                 donor.name,
@@ -226,6 +226,23 @@ def send_thank_you_menu(dlist):
     donor.add_donation(amount)
     print(donor.generate_letter())
 
+def make_projections(dlist):
+
+    dmin = None
+    dmax = None
+    dmul = None
+
+    menu = [
+        (f"enter min amount that multiplier will affect (currently {dmin})", input(">"), dmin),
+        (f"enter max amount that multiplier will affect (currently {dmax})", input(">"), dmax),
+        (f"enter a multiplier value (currently: {dmul})", input(">"), dmul),
+        ("run projection", dlist.challenge(dmul, dmin, dmax), None),
+        ("print report past contributions", dlist.print_report, None),
+        ("print report projected contributions", ),
+        ("print projected vs past summary", ),
+    ]
+    
+
 
 def menu(menu_data):
     """
@@ -260,6 +277,7 @@ if __name__ == "__main__":
         ('Send a Thank You', send_thank_you_menu, dl),
         ('Print a report', dl.print_report, None),
         ('Send letters to everyone', dl.send_letters_all, None),
+        ('Make donation projections', make_projections, dl),
         ('Load donor list', dl.load_donorlist, None),
         ('Save donor list', dl.save_donorlist, None),
         ('Quit', exit, None),
