@@ -323,13 +323,13 @@ if __name__ == "__main__":
         ('Quit', exit, None),
     ]
     while True:
-        #try:
+        try:
             fn, param = menu(menu_functions)
             if param:
                 fn(param)
             else:
                 fn()
-        #except TypeError:
-        #    continue
-        #except ValueError:
-        #    continue
+        except TypeError:
+            continue
+        except ValueError:
+            continue
