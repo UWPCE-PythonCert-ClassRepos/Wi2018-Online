@@ -83,8 +83,44 @@ class Donors(object):
             pickle.dump(self.donorlist, file_out)
         return self.count
 
-    def challenge(self, mul):
-        return Donors([(Donor(d.name, list(map(lambda x: x * mul, d.donations)))) for d in self.donorlist])
+    def challenge(self, mul, min_don=None, max_don=None):
+        """
+        Multiplies donations, returns a Donors object.
+        Note that this function destroys the original order of the donations, as multiplied donation values get
+        grouped together, and non-multiplied donations get moved to the end of the list.
+        :param mul: a multiplier to be applied to each donation value of each donor
+        :param min_don: multiplier only applies to values greater than this amount, if None - does not apply
+        :param max_don: multiplier only applies to values less than or equal to this amount, if None - does not apply
+        :return: a new Donors object, with multiplied donation values
+        """
+
+        # define the filter functions, based on if min or max values for donation multipliers were added
+        # unfortunately, PEP8 abhors assigning lambdas to variables, so here are some glorious Defs:
+        if min_don and max_don:
+            def fi(x): return max_don >= x > min_don
+
+            def not_fi(x): return x <= min_don or x > max_don
+
+        elif min_don:
+            def fi(x): return x > min_don
+
+            def not_fi(x): return x <= min_don
+
+        elif max_don:
+            def fi(x): return x <= max_don
+
+            def not_fi(x): return x > max_don
+        else:
+            def fi(x): return True
+
+            def not_fi(x): return False
+
+        return Donors(
+            [Donor(
+                donor.name,
+                list(map(lambda y: y * mul, filter(fi, donor.donations))) + list(filter(not_fi, donor.donations))
+            ) for donor in self.donorlist]
+        )
 
 
 class Donor(object):
