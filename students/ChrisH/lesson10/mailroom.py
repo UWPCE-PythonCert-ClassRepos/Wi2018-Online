@@ -28,7 +28,10 @@ class Donors(object):
         :return: None
         """
         # Find longest name in donor list, or use name_min value
-        name_max = max(*[len(donor.name) for donor in self.donorlist], 25)
+        if self.donorlist:
+            name_max = max(*[len(donor.name) for donor in self.donorlist], 25)
+        else:
+            name_max = 25
 
         rpt_title = "Donor Name" + ' ' * (name_max - 9) + "| Total Given | Num Gifts | Average Gift"
         print(rpt_title)
@@ -82,6 +85,10 @@ class Donors(object):
         with open(self.DATA_FILE, 'wb') as file_out:
             pickle.dump(self.donorlist, file_out)
         return self.count
+
+    def total_contribution(self):
+        return sum([sum(d.donations) for d in self.donorlist])
+
 
     def challenge(self, mul, min_don=None, max_don=None):
         """
@@ -226,28 +233,61 @@ def send_thank_you_menu(dlist):
     donor.add_donation(amount)
     print(donor.generate_letter())
 
+
 def make_projections(dlist):
 
-    dmin = None
-    dmax = None
-    dmul = None
+    dmin = 0
+    dmax = 0
+    dmul = 1
+    projection = dlist.challenge(dmul, dmin, dmax)
 
-    menu = [
-        (f"enter min amount that multiplier will affect (currently {dmin})", input(">"), dmin),
-        (f"enter max amount that multiplier will affect (currently {dmax})", input(">"), dmax),
-        (f"enter a multiplier value (currently: {dmul})", input(">"), dmul),
-        ("run projection", dlist.challenge(dmul, dmin, dmax), None),
-        ("print report past contributions", dlist.print_report, None),
-        ("print report projected contributions", ),
-        ("print projected vs past summary", ),
-    ]
-    
+    def set_val():
+        while True:
+            try:
+                value = float(input("set value > "))
+                if value <= 0:
+                    print('Must be a positive number.')
+                else:
+                    break
+            except ValueError:
+                print('Please enter a numerical value.')
+        return value
+
+    while True:
+        menu_projections = [
+            ("enter min amount that multiplier will affect. [Currently ${}]".format(dmin), set_val, 'dmin'),
+            ("enter max amount that multiplier will affect. [Currently ${}]".format(dmax), set_val, 'dmax'),
+            ("enter a multiplier value. [Currently {}]".format(dmul), set_val, 'dmul'),
+            ("print report past contributions", dlist.print_report, None),
+            ("print report projected contributions", projection.print_report, None),
+            ("print total contribution comparison", 'compare_total', None),
+            ("quit to main menu", 'quit', None),
+        ]
+
+        fn, param = menu(menu_projections)
+        if param == 'dmin':
+            dmin = fn()
+        elif param == 'dmax':
+            dmax = fn()
+        elif param == 'dmul':
+            dmul = fn()
+
+        # if a parameter is not None, then values have been updated, so update the projection
+        if param:
+            projection = dlist.challenge(dmul, dmin, dmax)
+        elif fn == 'compare_total':
+            print(f"Original total contribution: {dlist.total_contribution():.2f}")
+            print(f"Projected total contribution: {projection.total_contribution():.2f}")
+        elif fn == 'quit':
+            return
+        else:
+            fn()
 
 
 def menu(menu_data):
     """
     Prints the main user menu & retrieves user selection.
-    :param: a menu list, consisting of tuples with three values:
+    :param: a menu list, consisting of iterable with three values:
         [0]: text to be presented to user
         [1]: function that should be called for the menu item
         [2]: parameter that should be used in the function call, None if no parameter call needed
@@ -283,13 +323,13 @@ if __name__ == "__main__":
         ('Quit', exit, None),
     ]
     while True:
-        try:
+        #try:
             fn, param = menu(menu_functions)
             if param:
                 fn(param)
             else:
                 fn()
-        except TypeError:
-            continue
-        except ValueError:
-            continue
+        #except TypeError:
+        #    continue
+        #except ValueError:
+        #    continue
