@@ -32,6 +32,8 @@ class Element(object):
             kwarg_string = kwarg_string[:-2]
             file_out.write(kwarg_string)
             file_out.write(">\n")
+            # If this is a SelfClosingTag, end the render process here.
+            if isinstance(self, SelfClosingTag): return file_out
 
         # If this is a member of SelfClosingTag, we want only limited functionality.
         elif isinstance(self, SelfClosingTag):
@@ -109,12 +111,13 @@ class A(Element):
 
 class Ul(Element):
     """add unordered list"""
-    tag="ul"
+    tag = "ul"
 
 
 class Li(Element):
     """add list item"""
-    tag="li"
+    tag = "li"
+
 
 class H(OneLineTag):
     """add header tag"""
@@ -122,6 +125,7 @@ class H(OneLineTag):
     def __init__(self, level=1, content=None):
         self.tag = "h" + str(level)
         super().__init__(content)
+
 
 class Meta(SelfClosingTag):
     """Add meta tag."""
