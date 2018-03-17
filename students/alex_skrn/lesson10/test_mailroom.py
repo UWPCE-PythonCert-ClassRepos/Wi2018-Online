@@ -20,7 +20,9 @@ def donors():
     return res
 
 
+##################################
 # TESTS FOR THE SINGLE DONOR CLASS
+##################################
 def test_init_single_donor():
     """Test SingleDonor class instantiation, name and donations properties."""
     # what if an int is passed as a donation?
@@ -74,7 +76,53 @@ def test_get_last_donation():
     assert d1.get_last_donation() == 125
     assert d2.get_last_donation() == 1.75
 
+# @pytest.mark.parametrize("test_input,expected", [
+#     ("3+5", 8),
+#     ("2+4", 6),
+#     ("6*9", 42),
+# ])
+# def test_eval(test_input, expected):
+#     assert eval(test_input) == expected
+
+
+def test_challenge_creates_instance_single_donor():
+    """Test that challenge() returns the right type."""
+    d1 = SingleDonor("Jesse Eisenberg", (5, 15))
+    assert type(d1.challenge(1)) == SingleDonor
+
+
+@pytest.mark.parametrize('inp, exception',
+                         [(0, ValueError),
+                          (0.41, ValueError),
+                          (-1, ValueError),
+                          (-3.5, ValueError),
+                          ("a", ValueError),
+                          ]
+                         )
+def test_challenge_single_factor_wrong_input(inp, exception):
+    """Raise ValueError if the factor is wrong: negative or less than 1."""
+    d1 = SingleDonor("Jesse Eisenberg", (5, 15))
+    with pytest.raises(exception):
+        d1.challenge(inp)
+
+
+@pytest.mark.parametrize('inp, expectation',
+                         [(1, [10, 30]),
+                          (1.5, [12.5, 37.5]),
+                          (2, [15, 45]),
+                          (2.4, [17, 51]),
+                          ]
+                         )
+def test_challenge_single_factor_right_input(inp, expectation):
+    """Test that the donations property is updated correctly."""
+    d1 = SingleDonor("Jesse Eisenberg", (5, 15))
+    updated_donor = d1.challenge(inp)
+    assert updated_donor.donations == expectation
+
+
+############################
 # TESTS FOR THE DONORS CLASS
+############################
 def test_init_donors():
     """The Donors class instantiation."""
     d1 = SingleDonor("Bill Murray", 125)
@@ -144,7 +192,31 @@ def test_append(donors):
     # assert type(donors) == int  # Must fail
 
 
+def test_challenge_collection_donors_create_right_type(donors):
+    """Check that the method returns a Donors class object."""
+    d = donors.challenge(1)
+    assert type(d) == Donors
+    #
+    # d1 = SingleDonor("Bill Murray", [125, 1.0])
+    # d2 = SingleDonor("Woody Harrelson", [71.5, 1.25])
+    # d3 = SingleDonor("Jesse Eisenberg", [99.99, 1.75])
+
+
+def test_challenge_donors_right_output_donations(donors):
+    """Check that the Donors class object has donors with correct donations."""
+    d = donors.challenge(1)
+    assert d.get_donor("Bill Murray").donations == [250, 2]
+    assert d.get_donor("Woody Harrelson").donations == [143, 2.5]
+    assert d.get_donor("Jesse Eisenberg").donations == [199.98, 3.5]
+
+    d2 = donors.challenge(1.5)
+    assert d2.get_donor("Bill Murray").donations == pytest.approx([312.5, 2.5])
+    assert d2.get_donor("Woody Harrelson").donations == pytest.approx([178.75, 3.125])
+    assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([249.975, 4.375])
+
+###############################
 # TESTS FOR THE STARTMENU CLASS
+###############################
 def test_menu_selection_user_quits(monkeypatch):
     """Test menu_selection(). The user quits."""
     # This mocks the __init__ method in the StartMenu class
@@ -261,7 +333,7 @@ def test_input_donation_zero(monkeypatch):
 #     d3 = SingleDonor("Jesse", [99.99, 1.75, 16])
 #     all_donors = Donors([d1, d2, d3])
 #
-#     # This simultes the user entering "0" for quit on prompt
+#     # This simulates the user entering "0" for quit on prompt
 #     # but I guess a class instance that I create later remains in place
 #     # so I can test its methods and properties
 #     builtins.input = Mock()
@@ -320,7 +392,7 @@ def test_new_donor_interaction_user_input_new_name(donors):
     # WHEN the user enters a new name when prompted to enter a name
     # THEN the function should ask for a donation and print a thank-you email
 
-    # This simultes the user entering "0", "New Name", and donation amount on
+    # This simulates the user entering "0", "New Name", and donation amount on
     # a series of prompts, with the "0" to quit main_menu running at the start,
     # but I guess a class instance that I create remains in place
     # so I can test its methods
@@ -344,7 +416,7 @@ def test_old_donor_interaction_user_input_name(donors):
     # WHEN the user enters an old name when prompted to enter a name
     # THEN the function should ask for an amount and print a thank-you email
 
-    # This simultes the user entering "0" for quit on prompt
+    # This simulates the user entering "0" for quit on prompt
     # but I guess a class instance that I create remains in place
     # so I can test its methods
     builtins.input = Mock()
@@ -379,7 +451,7 @@ def test_input_donation_multiple_invalid_inputs():
     with patch.object(StartMenu, "__init__", lambda x, y: None):
         s = StartMenu(None)
 
-        # This simultes the user entering "A", then "-1", then "0" on prompts
+        # This simulates the user entering "A", then "-1", then "0" on prompts
         builtins.input = Mock()
         builtins.input.side_effect = ["A", "-1", "0"]
 
@@ -458,7 +530,7 @@ def test_write_cwd(monkeypatch, tmpdir, donors):
     # Check that the function indeed created 3 files ('cos there are 3 donors)
     # Check that the files created are not empty at least
 
-    # This simultes the user entering "0" for quit on prompt
+    # This simulates the user entering "0" for quit on prompt
     # but I guess a class instance that I create remains in place
     # so I can test its methods
     builtins.input = Mock()
@@ -493,7 +565,7 @@ def test_write_select_dir(monkeypatch, tmpdir, donors):
     # Check that the function indeed created 3 files ('cos there are 3 donors)
     # Check that the files created are not empty at least
 
-    # This simultes the user entering "0" for quit on prompt
+    # This simulates the user entering "0" for quit on prompt
     # but I guess a class instance that I create later remains in place
     # so I can test its methods
     builtins.input = Mock()
@@ -535,3 +607,62 @@ def test_write_select_dir_user_cancel():
         s.ask_user_dir.return_value = ""
 
         assert s.write_select_dir() is None
+
+
+def test_start_menu_user_choose_match_donations(donors):
+    """User chooses to match all donations by a factor of 1."""
+    # This simulates the user entering "0" to quit main_menu running at start,
+    # but I guess a class instance that I create remains in place
+    # so I can test its methods
+    # Then I test the challenge() method, where the user types a factor of 1
+    builtins.input = Mock()
+    builtins.input.side_effect = ["0", "1"]  # Multiple calls
+
+    # Captures all print statements the class object generates, into a mock object
+    with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+        # Instantitate a class object (though in reality this class never gets
+        # assigned to a name)
+        s = StartMenu(donors)
+
+        # Test that the challenge method correctly modifies self.donors
+        s.challenge()
+        assert s.donors.get_donor("Bill Murray").donations == [250, 2]
+        assert s.donors.get_donor("Woody Harrelson").donations == [143, 2.5]
+        assert s.donors.get_donor("Jesse Eisenberg").donations == [199.98, 3.5]
+
+        # Test that the create_report contains the correct sums
+        s.donors.create_report()
+        assert "252" in mock_stdout.getvalue()
+        assert "145.5" in mock_stdout.getvalue()
+
+
+def test_start_menu_user_choose_match_donations_wrong_inputs():
+    """Test StartMenu.challenge() for a number of invalid inputs."""
+    # On the first prompt to enter a number, the user enters "A"
+    #     The method prints "Input must be a number".
+    # Then, on the next prompt, the user enters "0.5".
+    #     The method prints "Input must not be less than 1"
+    # Then the user enters 0 to quit.
+    #     So the method returns False.
+
+    # This mocks the __init__ method in the StartMenu class
+    with patch.object(StartMenu, "__init__", lambda x, y: None):
+        s = StartMenu(None)
+
+        # This simulates the user entering "A", then "0.5", then "0" on prompts
+        builtins.input = Mock()
+        builtins.input.side_effect = ["A", "0.5", "0"]
+
+        # This captures all print statements into a mock object
+        with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+            res = s.challenge()
+
+            #  The method should generate the following print statements
+            assert "Input must be a number" in mock_stdout.getvalue()
+            assert "Input must not be less than 1" in mock_stdout.getvalue()
+
+            #  These statements should be in the following order
+            assert mock_stdout.getvalue().index("number") < mock_stdout.getvalue().index("less than")
+
+            # The method must return False when user enters 0 to quit
+            assert res is False

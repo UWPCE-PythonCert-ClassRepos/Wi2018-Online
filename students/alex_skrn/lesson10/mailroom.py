@@ -83,6 +83,12 @@ class SingleDonor(object):
         """Return the last donation."""
         return self._donations[-1]
 
+    def challenge(self, factor):
+        """Return a SingleDonor class object."""
+        if type(factor) is str or factor < 1:
+            raise ValueError("Factor must be a number >= 1")
+        matched_donations = list(map(lambda x: x + x * factor, self.donations))
+        return SingleDonor(self.name, matched_donations)
 
 ##############
 # DONORS CLASS
@@ -152,6 +158,11 @@ class Donors(object):
         report += "\n"
         print(report)
 
+    def challenge(self, factor):
+        """Return a new Donors class object."""
+        donors = [donor.challenge(factor) for donor in self._donors]
+        return Donors(donors)
+
 
 ##################
 # START MENU CLASS
@@ -187,6 +198,7 @@ class StartMenu(object):
         return {"1": self.send_thank_you_sub_menu,
                 "2": self.donors.create_report,
                 "3": self.send_all_sub_menu,
+                "4": self.challenge,
                 "0": self.quit,
                 }
 
@@ -196,6 +208,7 @@ class StartMenu(object):
                 "\n1 - Send a Thank You\n"
                 "2 - Create a Report\n"
                 "3 - Send letters to everyone\n"
+                "4 - Match donations\n"
                 "0 - Quit\n"
                 ">> "
                 )
@@ -359,6 +372,24 @@ class StartMenu(object):
             self.write_file(self.get_full_path(target_dir, donor.name), text)
 
         print("\nAll letters saved in {}\n".format(target_dir))
+
+    # Matching donations
+    def challenge(self):
+        """Update self.donors by increasing all donations by a factor."""
+        message = "Type the matching factor (>= 1) or 0 to quit >>> "
+        while True:
+            try:
+                factor = float(input(message))
+            except ValueError:
+                print("Input must be a number")
+            else:
+                if factor == 0:
+                    return False
+                elif factor < 1:
+                    print("Input must not be less than 1")
+                else:
+                    self.donors = self.donors.challenge(factor)
+                    return True
 
 
 # Load data and run
