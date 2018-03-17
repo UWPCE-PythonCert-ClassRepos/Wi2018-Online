@@ -62,6 +62,10 @@ class Element(object):
 class Html(Element):
     tag = "html"
 
+    def render(self, file_out, cur_ind=""):
+        file_out.write("<!DOCTYPE html>\n")
+        super().render(file_out, cur_ind="")
+
 
 class Body(Element):
     tag = "body"
@@ -118,3 +122,7 @@ class H(OneLineTag):
     def __init__(self, level=1, content=None):
         self.tag = "h" + str(level)
         super().__init__(content)
+
+class Meta(SelfClosingTag):
+    """Add meta tag."""
+    tag = "meta"
