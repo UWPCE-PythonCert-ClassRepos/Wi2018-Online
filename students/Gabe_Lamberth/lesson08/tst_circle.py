@@ -32,6 +32,16 @@ class TstCircle(TestCase):
         c = Circle(5)
         self.assertEqual(c.area, 79)
 
+    def test_add(self):
+        c1 = Circle(3)
+        c2 = Circle(4)
+        self.assertEqual(c1.radius + c2.radius, 7)
+
+    def test_mul(self):
+        c1 = Circle(3)
+        c2 = Circle(4)
+        self.assertEqual(c1.radius * c2.radius, 12)
+
 
 if __name__ == 'main':
     TestCase()
