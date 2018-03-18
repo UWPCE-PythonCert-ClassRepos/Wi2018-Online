@@ -35,7 +35,7 @@ def send_thank_you():
         elif name not in donor_names():
             # New donor, get his info and print thank you note
             amount = float(input("New Donor. Enter the donation amount:"))
-            donation_dict[name] += [amount]
+            donation_dict[name] = [amount]
             print_thank_you(name)
         elif name in donor_names():
             print_thank_you(name)
