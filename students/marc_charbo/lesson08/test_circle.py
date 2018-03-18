@@ -36,6 +36,33 @@ class CircleTest(TestCase):
         cr3 = Circle(6)
         self.assertEqual(cr.radius+cr2.radius,6)
 
-    def test_add(self):
+    def test_multiply(self):
         cr = Circle(2)
         self.assertEqual(cr.radius*3,6)
+
+    def test_lt(self):
+        cr = Circle(2)
+        cr2 = Circle(4)
+        #self.assertLess(cr,cr2) # could also use this test
+        self.assertTrue(cr < cr2)
+
+    def test_lt(self):
+        cr = Circle(2)
+        cr2 = Circle(4)
+        #self.assertLess(cr,cr2) # could also use this test
+        self.assertTrue(cr < cr2)
+
+    def test_gt(self):
+        cr = Circle(10)
+        cr2 = Circle(9)
+        self.assertTrue(cr > cr2)
+
+    def test_eq(self):
+        cr = Circle(11)
+        cr2 = Circle(11)
+        self.assertTrue(cr == cr2)
+
+    def test_ne(self):
+        cr = Circle(10)
+        cr2 = Circle(1)
+        self.assertTrue(cr != cr2)
