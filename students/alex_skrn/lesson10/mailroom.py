@@ -40,12 +40,10 @@ class SingleDonor(object):
         """Provide a getter method for the donations property."""
         return self._donations
 
-    @staticmethod
     def sort_by_total(self):
         """Provide a sort_key for sorting by total donations."""
         return sum(self._donations)
 
-    @staticmethod
     def sort_by_name(self):
         """Provide a sort_key for sorting by name."""
         return self._name
