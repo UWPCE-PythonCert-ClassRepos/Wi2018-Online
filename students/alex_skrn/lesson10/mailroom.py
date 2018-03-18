@@ -109,7 +109,7 @@ class SingleDonor(object):
             else:
                 return True
 
-        # As for using map, this works fine, but looks worse
+        # As for using map, the following works fine, but looks worse
         # than just using list comprehension below, even if I use lambda.
         # def multiplication(x):
         #     if is_within_range(x):
@@ -128,7 +128,7 @@ class SingleDonor(object):
 
                                  )
 
-        # The following also works fine and looks simpler than map
+        # The following also works fine and looks much simpler than map
         # As for filter, I couldn't find any use for it, 'cos it only produces
         # a part of a list, while I need a complete list, otherwise
         # I end up filtering out a part of old donations
@@ -223,6 +223,10 @@ class Donors(object):
                   ]
         return Donors(donors)
 
+    def get_total(self):
+        """Return the aggregate amount of donations for all donors."""
+        return sum([sum(donor.donations) for donor in self._donors])
+
 
 ##################
 # START MENU CLASS
@@ -259,6 +263,7 @@ class StartMenu(object):
                 "2": self.create_report,
                 "3": self.send_all_sub_menu,
                 "4": self.challenge,
+                "5": self.run_projection,
                 "0": self.quit,
                 }
 
@@ -269,6 +274,7 @@ class StartMenu(object):
                 "2 - Create a Report\n"
                 "3 - Send letters to everyone\n"
                 "4 - Match donations\n"
+                "5 - Run a projection\n"
                 "0 - Quit\n"
                 ">> "
                 )
@@ -470,39 +476,54 @@ class StartMenu(object):
                     else:
                         return value
 
-    def challenge(self):
+    def challenge(self, projection=False):
         """Increase some or all of donations by a factor, subj. to min/max."""
-        factor = self.get_user_input(("Type the matching factor (>= 1) "
+        if projection:
+            print("(This is a projection)")
+        else:
+            print("(This is NOT a projection!)")
+        factor = self.get_user_input(("Type a matching factor > 1 "
                                       "or 0 to quit >>> "),
                                      factor=True)
         if not factor:  # User chooses to quit this sub-menu
             return False
 
-        min_donation = self.get_user_input(("Type min donation, "
-                                            "0 to quit, "
-                                            "or Enter to skip >>> "))
-        if not min_donation:  # User chooses to quit this sub-menu
+        min = self.get_user_input(("Type MIN donation, "
+                                   "0 to quit, "
+                                   "or Enter to skip >>> "))
+        if not min:  # User chooses to quit this sub-menu
             return False
 
-        max_donation = self.get_user_input(("Type max donation, "
-                                            "0 to quit, "
-                                            "or Enter to skip >>> "))
-        if not max_donation:  # User chooses to quit this sub-menu
+        max = self.get_user_input(("Type MAX donation, "
+                                   "0 to quit, "
+                                   "or Enter to skip >>> "))
+        if not max:  # User chooses to quit this sub-menu
             return False
 
         # User may wish not to indicate min or max or both
-        if min_donation != "skip" and max_donation != "skip":
-            self.donors = self.donors.challenge(factor,
-                                                min_donation,
-                                                max_donation
-                                                )
-        elif min_donation != "skip":
-            self.donors = self.donors.challenge(factor, min_donation)
-        elif max_donation != "skip":
-            self.donors = self.donors.challenge(factor, max_donation)
+        if min != "skip" and max != "skip":
+            result = self.donors.challenge(factor,
+                                           min_donation=min,
+                                           max_donation=max
+                                           )
+        elif min != "skip":
+            result = self.donors.challenge(factor, min_donation=min)
+        elif max != "skip":
+            result = self.donors.challenge(factor, max_donation=max)
         else:
-            self.donors = self.donors.challenge(factor)
+            result = self.donors.challenge(factor)
+        # Either run in projection or live mode
+        if projection:
+            return result.get_total() - self.donors.get_total()
+        else:
+            self.donors = result
+
         return True
+
+    def run_projection(self):
+        """Get user input and return a projected amount of donations."""
+        estimate = self.challenge(projection=True)
+        print("\nYou contribution would total ${:.2f}".format(estimate))
 
 
 # Load data and run

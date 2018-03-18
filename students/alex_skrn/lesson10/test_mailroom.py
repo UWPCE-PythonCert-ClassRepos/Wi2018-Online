@@ -252,10 +252,6 @@ def test_challenge_collection_donors_create_right_type(donors):
     """Check that the method returns a Donors class object."""
     d = donors.challenge(2)
     assert type(d) == Donors
-    #
-    # d1 = SingleDonor("Bill Murray", [125, 1.0])
-    # d2 = SingleDonor("Woody Harrelson", [71.5, 1.25])
-    # d3 = SingleDonor("Jesse Eisenberg", [99.99, 1.75])
 
 
 def test_challenge_donors_right_output_donations(donors):
@@ -270,23 +266,27 @@ def test_challenge_donors_right_output_donations(donors):
     assert d2.get_donor("Woody Harrelson").donations == pytest.approx([107.25, 1.875])
     assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([149.985, 2.625])
 
-
-def test_challenge_donors_right_output_donations2(donors):
+@pytest.mark.parametrize('name, min, max, expected',
+                         [("Bill Murray", None, 100, [125, 2]),
+                          ("Bill Murray", 100, None, [250, 1]),
+                          ("Bill Murray", 70, 100, [125, 1]),
+                          ("Woody Harrelson", None, 100, [143, 2.5]),
+                          ("Woody Harrelson", 100, None, [71.5, 1.25]),
+                          ("Woody Harrelson", 70, 100, [143, 1.25]),
+                          ("Jesse Eisenberg", None, 100, [199.98, 3.5]),
+                          ("Jesse Eisenberg", 100, None, [99.99, 1.75]),
+                          ("Jesse Eisenberg", 70, 100, [199.98, 1.75]),
+                          ]
+                         )
+def test_challenge_donors_right_output_donations2(donors, name, min, max, expected):
     """Check that the Donors class object has donors with correct donations."""
-    d = donors.challenge(2, max_donation=100)
-    assert d.get_donor("Bill Murray").donations == [125, 2]
-    assert d.get_donor("Woody Harrelson").donations == [143, 2.5]
-    assert d.get_donor("Jesse Eisenberg").donations == [199.98, 3.5]
+    d = donors.challenge(2, min_donation=min, max_donation=max)
+    assert d.get_donor(name).donations == expected
 
-    d2 = donors.challenge(2, min_donation=100)
-    assert d2.get_donor("Bill Murray").donations == [250, 1]
-    assert d2.get_donor("Woody Harrelson").donations == [71.5, 1.25]
-    assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([99.99, 1.75])
 
-    d3 = donors.challenge(2, min_donation=70, max_donation=100)
-    assert d3.get_donor("Bill Murray").donations == pytest.approx([125, 1])
-    assert d3.get_donor("Woody Harrelson").donations == pytest.approx([143, 1.25])
-    assert d3.get_donor("Jesse Eisenberg").donations == pytest.approx([199.98, 1.75])
+def test_get_total(donors):
+    """Test that the function return that right values."""
+    assert donors.get_total() == 300.49
 
 
 ###############################
@@ -683,8 +683,13 @@ def test_write_select_dir_user_cancel():
 
         assert s.write_select_dir() is None
 
-
-def test_start_menu_match_donations(donors):
+@pytest.mark.parametrize('name, expected',
+                         [("Bill Murray", [250, 2]),
+                          ("Woody Harrelson", [143, 2.5]),
+                          ("Jesse Eisenberg", [199.98, 3.5])
+                          ]
+                         )
+def test_start_menu_match_donations(donors, name, expected):
     """User chooses to match all donations by a factor of 2."""
     # This simulates the user entering "0" to quit main_menu running at start,
     # but I guess a class instance that I create remains in place
@@ -702,9 +707,7 @@ def test_start_menu_match_donations(donors):
 
         # Test that the challenge method correctly modifies self.donors
         s.challenge()
-        assert s.donors.get_donor("Bill Murray").donations == [250, 2]
-        assert s.donors.get_donor("Woody Harrelson").donations == [143, 2.5]
-        assert s.donors.get_donor("Jesse Eisenberg").donations == [199.98, 3.5]
+        assert s.donors.get_donor(name).donations == expected
 
         # Test that the create_report contains the correct sums
         s.donors.create_report()
@@ -743,13 +746,19 @@ def test_start_menu_match_donations_wrong_inputs():
             # The method must return False when user enters 0 to quit
             assert res is False
 
-def test_start_menu_match_donations2(donors):
+
+@pytest.mark.parametrize('name, expected',
+                         [("Bill Murray", [250, 1]),
+                          ("Woody Harrelson", [71.5, 1.25]),
+                          ("Jesse Eisenberg", [99.99, 1.75])
+                          ]
+                         )
+def test_start_menu_match_donations2(donors, name, expected):
     """User matches all donations by a factor of 2 subject to conditions."""
     # This simulates the user entering "0" to quit main_menu running at start,
     # but I guess a class instance that I create remains in place
     # so I can test its methods
-    # Then I test the challenge() method, where the user types a factor of 2
-    # Then he types 100 as a min_donation and hist enter to skip max_donation
+    # ["0", "2", "100", ""] means to double donations above $100
     builtins.input = Mock()
     builtins.input.side_effect = ["0", "2", "100", ""]  # Multiple calls
 
@@ -761,6 +770,34 @@ def test_start_menu_match_donations2(donors):
 
         # Test that the challenge method correctly modifies self.donors
         s.challenge()
-        assert s.donors.get_donor("Bill Murray").donations == [250, 1]
-        assert s.donors.get_donor("Woody Harrelson").donations == [71.5, 1.25]
-        assert s.donors.get_donor("Jesse Eisenberg").donations == pytest.approx([99.99, 1.75])
+        assert s.donors.get_donor(name).donations == expected
+
+
+@pytest.mark.parametrize('user_input, expected',
+                         [(["0", "2", "", ""], "300.49"),
+                          (["0", "3", "50", ""], "592.98"),
+                          (["0", "2", "-1", "100"], "175.49"),
+                          (["0", "2", "-1", "1"], "0"),
+                          ]
+                         )
+def test_start_menu_projection(donors, user_input, expected):
+    """Check that projection returns the right amounts."""
+    # This simulates the user entering "0" to quit main_menu running at start,
+    # but I guess a class instance that I create remains in place
+    # so I can test its methods
+    # Then run_projection is tested on several user input cases
+    # eg. ["0", "2", "", ""] means to double all donations
+    # ["0", "3", "50", ""] measn to triple donations over $50
+    # ["0", "2", "-1", "100"] means to double donations above -1 and under $100
+    builtins.input = Mock()
+    builtins.input.side_effect = user_input
+
+    # Captures all print statements the class object generates, into a mock object
+    with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+        # Instantitate a class object (though in reality this class never gets
+        # assigned to a name)
+        s = StartMenu(donors)
+
+        # Test that the method prints the corect result
+        s.run_projection()
+        assert expected in mock_stdout.getvalue()
