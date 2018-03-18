@@ -106,6 +106,10 @@ def test_challenge_single_factor_wrong_input(inp, exception):
     with pytest.raises(exception):
         d1.challenge(inp)
 
+def test_challenge_one_max_input():
+    d1 = SingleDonor("Bill Murray", [125, 1.0])
+    updated_donor = d1.challenge(2, max_donation=100)
+    assert updated_donor.donations == [125, 2]
 
 @pytest.mark.parametrize('inp, expectation',
                          [(1.5, [7.5, 22.5]),
@@ -117,7 +121,59 @@ def test_challenge_single_factor_right_input(inp, expectation):
     """Test that the donations property is updated correctly."""
     d1 = SingleDonor("Jesse Eisenberg", (5, 15))
     updated_donor = d1.challenge(inp)
+    assert len(d1.donations) == len(updated_donor.donations)
     assert updated_donor.donations == expectation
+
+@pytest.mark.parametrize('factor, min, expected',
+                         [(1.5, 2, [1, 2, 7.5, 9, 10.5, 15, 22.5]),
+                          (2, 7, [1, 2, 5, 6, 7, 20, 30]),
+                          ]
+                         )
+def test_challenge_min_filter(factor, min, expected):
+    """Test that only donations above min are multipled."""
+    d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
+    updated_donor = d1.challenge(factor, min_donation=min)
+    assert len(d1.donations) == len(updated_donor.donations)
+    assert updated_donor.donations == expected
+
+
+@pytest.mark.parametrize('factor, max, expected',
+                         [(1.5, 5, [1.5, 3, 5, 6, 7, 10, 15]),
+                          (2, 10, [2, 4, 10, 12, 14, 10, 15]),
+                          ]
+                         )
+def test_challenge_max_filter(factor, max, expected):
+    """Test that only donations below max are multiplied."""
+    d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
+    updated_donor = d1.challenge(factor, max_donation=max)
+    assert len(d1.donations) == len(updated_donor.donations)
+    assert updated_donor.donations == expected
+
+
+@pytest.mark.parametrize('factor, min, max, expected',
+                         [(1.5, 5, 10, [1, 2, 5, 9, 10.5, 10, 15]),
+                          (2, 2, 10, [1, 2, 10, 12, 14, 10, 15]),
+                          ]
+                         )
+def test_challenge_min_max_filter(factor, min, max, expected):
+    """Test that only donations above min and below max are multiplied."""
+    d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
+    updated_donor = d1.challenge(factor, min_donation=min, max_donation=max)
+    assert len(d1.donations) == len(updated_donor.donations)
+    assert updated_donor.donations == expected
+
+
+@pytest.mark.parametrize('factor, min, max, expected',
+                         [(2, 2, "a", ValueError),
+                          (2, "a", 2, ValueError),
+                          (2, "a", "a", ValueError),
+                          ]
+                         )
+def test_challenge_min_max_filter_wrong_input(factor, min, max, expected):
+    """Test wrong input for min-max parameters."""
+    d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
+    with pytest.raises(expected):
+        updated_donor = d1.challenge(factor, min_donation=min, max_donation=max)
 
 
 ############################
@@ -213,6 +269,25 @@ def test_challenge_donors_right_output_donations(donors):
     assert d2.get_donor("Bill Murray").donations == pytest.approx([187.5, 1.5])
     assert d2.get_donor("Woody Harrelson").donations == pytest.approx([107.25, 1.875])
     assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([149.985, 2.625])
+
+
+def test_challenge_donors_right_output_donations2(donors):
+    """Check that the Donors class object has donors with correct donations."""
+    d = donors.challenge(2, max_donation=100)
+    assert d.get_donor("Bill Murray").donations == [125, 2]
+    assert d.get_donor("Woody Harrelson").donations == [143, 2.5]
+    assert d.get_donor("Jesse Eisenberg").donations == [199.98, 3.5]
+
+    d2 = donors.challenge(2, min_donation=100)
+    assert d2.get_donor("Bill Murray").donations == [250, 1]
+    assert d2.get_donor("Woody Harrelson").donations == [71.5, 1.25]
+    assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([99.99, 1.75])
+
+    d3 = donors.challenge(2, min_donation=70, max_donation=100)
+    assert d3.get_donor("Bill Murray").donations == pytest.approx([125, 1])
+    assert d3.get_donor("Woody Harrelson").donations == pytest.approx([143, 1.25])
+    assert d3.get_donor("Jesse Eisenberg").donations == pytest.approx([199.98, 1.75])
+
 
 ###############################
 # TESTS FOR THE STARTMENU CLASS
@@ -609,14 +684,15 @@ def test_write_select_dir_user_cancel():
         assert s.write_select_dir() is None
 
 
-def test_start_menu_user_choose_match_donations(donors):
-    """User chooses to match all donations by a factor of 1."""
+def test_start_menu_match_donations(donors):
+    """User chooses to match all donations by a factor of 2."""
     # This simulates the user entering "0" to quit main_menu running at start,
     # but I guess a class instance that I create remains in place
     # so I can test its methods
     # Then I test the challenge() method, where the user types a factor of 2
+    # and then skips twice when prompted to enter min and max amounts
     builtins.input = Mock()
-    builtins.input.side_effect = ["0", "2"]  # Multiple calls
+    builtins.input.side_effect = ["0", "2", "", ""]  # Multiple calls
 
     # Captures all print statements the class object generates, into a mock object
     with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
@@ -636,7 +712,7 @@ def test_start_menu_user_choose_match_donations(donors):
         assert "145.5" in mock_stdout.getvalue()
 
 
-def test_start_menu_user_choose_match_donations_wrong_inputs():
+def test_start_menu_match_donations_wrong_inputs():
     """Test StartMenu.challenge() for a number of invalid inputs."""
     # On the first prompt to enter a number, the user enters "A"
     #     The method prints "Input must be a number".
@@ -659,10 +735,32 @@ def test_start_menu_user_choose_match_donations_wrong_inputs():
 
             #  The method should generate the following print statements
             assert "Input must be a number" in mock_stdout.getvalue()
-            assert "Input must be greater than 1" in mock_stdout.getvalue()
+            assert "Factor must be greater than 1" in mock_stdout.getvalue()
 
             #  These statements should be in the following order
             assert mock_stdout.getvalue().index("number") < mock_stdout.getvalue().index("greater than")
 
             # The method must return False when user enters 0 to quit
             assert res is False
+
+def test_start_menu_match_donations2(donors):
+    """User matches all donations by a factor of 2 subject to conditions."""
+    # This simulates the user entering "0" to quit main_menu running at start,
+    # but I guess a class instance that I create remains in place
+    # so I can test its methods
+    # Then I test the challenge() method, where the user types a factor of 2
+    # Then he types 100 as a min_donation and hist enter to skip max_donation
+    builtins.input = Mock()
+    builtins.input.side_effect = ["0", "2", "100", ""]  # Multiple calls
+
+    # Captures all print statements the class object generates, into a mock object
+    with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
+        # Instantitate a class object (though in reality this class never gets
+        # assigned to a name)
+        s = StartMenu(donors)
+
+        # Test that the challenge method correctly modifies self.donors
+        s.challenge()
+        assert s.donors.get_donor("Bill Murray").donations == [250, 1]
+        assert s.donors.get_donor("Woody Harrelson").donations == [71.5, 1.25]
+        assert s.donors.get_donor("Jesse Eisenberg").donations == pytest.approx([99.99, 1.75])

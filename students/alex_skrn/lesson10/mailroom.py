@@ -83,11 +83,64 @@ class SingleDonor(object):
         """Return the last donation."""
         return self._donations[-1]
 
-    def challenge(self, factor):
-        """Return a SingleDonor class object."""
+
+    def challenge(self, factor, min_donation=None, max_donation=None):
+        """Return a SingleDonor class object with modified donations.
+
+        Either multiply all donations by the factor, or
+        multiply only those donations which are above min_donation and/or
+        below max_donation, if any of these parameters are provided,
+        while those donations which are outside the min-max range remains
+        unchanged.
+        Raise ValueError if factor is a str or <= 1, or if min or max is a str.
+        """
         if type(factor) is str or factor <= 1:
             raise ValueError("Factor must be a number > 1")
-        matched_donations = list(map(lambda x: x * factor, self.donations))
+        elif type(min_donation) is str or type(max_donation) is str:
+            raise ValueError("Input must be a number")
+
+        # Helper function.
+        def is_within_range(x):
+            """Return True if x is within min-max or min-max are undefined."""
+            if min_donation is not None and max_donation is not None:
+                return min_donation < x < max_donation
+            elif min_donation is not None:
+                return x > min_donation
+            elif max_donation is not None:
+                return x < max_donation
+            else:
+                return True
+
+        # As for using map, this works fine, but looks worse
+        # than just using list comprehension below, even if I use lambda.
+        # def multiplication(x):
+        #     if is_within_range(x):
+        #         return x * factor
+        #     else:
+        #         return x
+        #
+        # matched_donations = list(map(multiplication, self.donations))
+
+        # Alternatively, with lambda
+        matched_donations = list(map(lambda x: x * factor
+                                     if is_within_range(x)
+                                     else x,
+                                     self.donations
+                                     )
+
+                                 )
+
+        # The following also works fine and looks simpler than map
+        # As for filter, I couldn't find any use for it, 'cos it only produces
+        # a part of a list, while I need a complete list, otherwise
+        # I end up filtering out a part of old donations
+        #
+        # matched_donations = [x * factor
+        #                      if is_within_range(x)
+        #                      else x
+        #                      for x in self.donations
+        #                      ]
+
         return SingleDonor(self.name, matched_donations)
 
 ##############
@@ -105,7 +158,6 @@ class Donors(object):
         return iter(self._donors)
 
     # def __str__(self):
-    #     """Provide a __str__ method based on __repr__ method of SD class."""
     #     # Used only for debugging -- to be removed or commented out
     #     return str([donor.__repr__() for donor in self._donors])
 
@@ -133,11 +185,10 @@ class Donors(object):
                     ]
         num = len(donors_L)
         donors_S = (("\n" + ", ".join(["{}"] * num)).format(*donors_L))
-        # print(donors_S)
+        print(donors_S)
 
     def create_report(self):
         """Create and print a report."""
-        # print("in create_report(): ", id(self._donors))
         report = ""
         title_line_form = "\n{:<26}{:^3}{:>13}{:^3}{:>13}{:^3}{:>13}\n"
         title_line_text = ('Donor Name', '|', 'Total Given', '|',
@@ -164,9 +215,14 @@ class Donors(object):
         report += "\n"
         print(report)
 
-    def challenge(self, factor):
+    def challenge(self, factor, min_donation=None, max_donation=None):
         """Return a new Donors class object."""
-        donors = [donor.challenge(factor) for donor in self._donors]
+        donors = [donor.challenge(factor,
+                                  min_donation,
+                                  max_donation
+                                  )
+                  for donor in self._donors
+                  ]
         return Donors(donors)
 
 
@@ -250,7 +306,6 @@ class StartMenu(object):
         # 'cos, I assume, its value is evaluated once in the dispatch dict
         # when the program first starts running
         # and does not change later during the program execution
-        # and none of my tests catched this problem
         self.donors.print_donor_names()
 
     def create_report(self):
@@ -259,7 +314,6 @@ class StartMenu(object):
         # 'cos, I assume, its value is evaluated once in the dispatch dict
         # when the program first starts running
         # and does not change later during the program execution
-        # and none of my tests catched this problem
         self.donors.create_report()
 
     def get_email(self, name, amount):
@@ -290,7 +344,6 @@ class StartMenu(object):
                         donor = self.donors.get_donor(name)
                     except ValueError:  # name is a new donor - create him
                         self.donors.append(SingleDonor(name, donation_amount))
-                        # print("in input_donation() ", id(self.donors))
                     else:
                         donor.add_donation(donation_amount)
                     return True
@@ -399,24 +452,59 @@ class StartMenu(object):
         print("\nAll letters saved in {}\n".format(target_dir))
 
     # Matching donations
-    def challenge(self):
-        """Update self.donors by increasing all donations by a factor."""
-        message = "Type the matching factor (>= 1) or 0 to quit >>> "
+    def get_user_input(self, msg, factor=False):
+        """Helper functon for the challenge method."""
         while True:
-            try:
-                factor = float(input(message))
-            except ValueError:
-                print("Input must be a number")
+            value = input(msg)
+            if value == "" and not factor:  # User hits Enter to skip
+                value = "skip"
+                return value
             else:
-                if factor == 0:
-                    return False
-                elif factor <= 1:
-                    print("Input must be greater than 1")
+                try:
+                    value = float(value)
+                except ValueError:
+                    print("Input must be a number")
                 else:
-                    self.donors = self.donors.challenge(factor)
-                    # print(self.donors)
-                    # print(id(self.donors))
-                    return True
+                    if value == 0:  # User chooses to quit
+                        return False
+                    elif value <= 1 and factor:
+                        print("Factor must be greater than 1")
+                    else:
+                        return value
+
+    def challenge(self):
+        """Increase some or all of donations by a factor, subj. to min/max."""
+        factor = self.get_user_input(("Type the matching factor (>= 1) "
+                                      "or 0 to quit >>> "),
+                                     factor=True)
+        if not factor:  # User chooses to quit this sub-menu
+            return False
+
+        min_donation = self.get_user_input(("Type min donation, "
+                                            "0 to quit, "
+                                            "or Enter to skip >>> "))
+        if not min_donation:  # User chooses to quit this sub-menu
+            return False
+
+        max_donation = self.get_user_input(("Type max donation, "
+                                            "0 to quit, "
+                                            "or Enter to skip >>> "))
+        if not max_donation:  # User chooses to quit this sub-menu
+            return False
+
+        # User may wish not to indicate min or max or both
+        if min_donation != "skip" and max_donation != "skip":
+            self.donors = self.donors.challenge(factor,
+                                                min_donation,
+                                                max_donation
+                                                )
+        elif min_donation != "skip":
+            self.donors = self.donors.challenge(factor, min_donation)
+        elif max_donation != "skip":
+            self.donors = self.donors.challenge(factor, max_donation)
+        else:
+            self.donors = self.donors.challenge(factor)
+        return True
 
 
 # Load data and run
