@@ -8,7 +8,7 @@
 
 class Element(object):
 
-    indent = ""
+    indent = "2"
     tag = ""
 
     def __init__(self, content=None, **kwargs):
@@ -24,43 +24,59 @@ class Element(object):
         self.content.append(append_text)
 
     def render(self, file_out, cur_ind=""):
+
+        spacing = ""
+
+        if cur_ind:
+            spacing = cur_ind + " " * int(self.indent)
+        elif self.indent:
+            spacing = " " * int(self.indent)
+
+        # print("indent =" + self.indent + "spacing =*" + spacing + "*")
+
         if self.kwarg_dict:
-            file_out.write("<" + self.tag + " ")
+            file_out.write(spacing + "<" + self.tag + " ")
             kwarg_string = ""
             for key in self.kwarg_dict:
                 kwarg_string += (key + '="' + self.kwarg_dict[key] + '"' + ", ")
             kwarg_string = kwarg_string[:-2]
             file_out.write(kwarg_string)
             file_out.write(">\n")
+            # If this is a SelfClosingTag, end the render process here.
+            if isinstance(self, SelfClosingTag): return file_out
 
         # If this is a member of SelfClosingTag, we want only limited functionality.
         elif isinstance(self, SelfClosingTag):
-            if self.tag: file_out.write("<" + self.tag + " />\n")
+            if self.tag: file_out.write(spacing + "<" + self.tag + " />\n")
             return file_out
         # If this is a member of OneLineTag, we don't want any carriage returns.
         elif isinstance(self, OneLineTag):
-            file_out.write("<" + self.tag + "> ")
+            file_out.write(spacing + "<" + self.tag + "> ")
         elif self.tag:
-            file_out.write("<" + self.tag + ">\n")
+            file_out.write(spacing + "<" + self.tag + ">\n")
 
         for element in self.content:
             try:
-                element.render(file_out, "")
+                element.render(file_out, spacing)
             except AttributeError:
                 if isinstance(self, OneLineTag):
-                    file_out.write(cur_ind + str(element))
+                    file_out.write(str(element))
                 else:
-                    file_out.write(cur_ind + str(element) + "\n")
+                    file_out.write(spacing + (" " * int(self.indent)) + str(element) + "\n")
 
         if isinstance(self, OneLineTag):
             file_out.write(" </" + self.tag + ">\n")
         elif self.tag:
-            file_out.write("</" + self.tag + ">\n")
+            file_out.write(spacing + "</" + self.tag + ">\n")
         return file_out
 
 
 class Html(Element):
     tag = "html"
+
+    def render(self, file_out, cur_ind=""):
+        file_out.write("<!DOCTYPE html>\n")
+        super().render(file_out, cur_ind="")
 
 
 class Body(Element):
@@ -105,12 +121,13 @@ class A(Element):
 
 class Ul(Element):
     """add unordered list"""
-    tag="ul"
+    tag = "ul"
 
 
 class Li(Element):
     """add list item"""
-    tag="li"
+    tag = "li"
+
 
 class H(OneLineTag):
     """add header tag"""
@@ -118,3 +135,8 @@ class H(OneLineTag):
     def __init__(self, level=1, content=None):
         self.tag = "h" + str(level)
         super().__init__(content)
+
+
+class Meta(SelfClosingTag):
+    """Add meta tag."""
+    tag = "meta"

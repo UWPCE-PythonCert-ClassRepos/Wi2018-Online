@@ -32,7 +32,7 @@ class htmltest(unittest.TestCase):
             object.render(outfile, cur_ind="")
         with open("outfile.html", "r") as infile:
             content = infile.read()
-            assert content == "<html>\n1\n</html>\n"
+            assert content == "<!DOCTYPE html>\n<html>\n1\n</html>\n"
 
     def test_render_body(self):
         """Test that render renders body tag."""
@@ -145,13 +145,19 @@ Here is a paragraph of text -- there could be more of them, but this is enough  
 
     def test_h(self):
         object = hr.H(2, "PythonClass - Class 6 example")
+        with open("outfile.html", "w") as outfile:
+            object.render(outfile, cur_ind="")
+        with open("outfile.html", "r") as infile:
+            content = infile.read()
+            assert content == '<h2> PythonClass - Class 6 example </h2>\n'
+
+    def test_meta(self):
+        object = hr.Meta(charset="UTF-8")
         with open("outfile3.html", "w") as outfile:
             object.render(outfile, cur_ind="")
         with open("outfile3.html", "r") as infile:
             content = infile.read()
-            assert content == '<h2> PythonClass - Class 6 example </h2>\n'
-
-
+            assert content == '<meta charset="UTF-8">\n'
 
 if __name__ == '__main__':
     unittest.main()
