@@ -85,9 +85,9 @@ class SingleDonor(object):
 
     def challenge(self, factor):
         """Return a SingleDonor class object."""
-        if type(factor) is str or factor < 1:
-            raise ValueError("Factor must be a number >= 1")
-        matched_donations = list(map(lambda x: x + x * factor, self.donations))
+        if type(factor) is str or factor <= 1:
+            raise ValueError("Factor must be a number > 1")
+        matched_donations = list(map(lambda x: x * factor, self.donations))
         return SingleDonor(self.name, matched_donations)
 
 ##############
@@ -103,6 +103,11 @@ class Donors(object):
     def __iter__(self):
         """Make the Donors class object iterable."""
         return iter(self._donors)
+
+    # def __str__(self):
+    #     """Provide a __str__ method based on __repr__ method of SD class."""
+    #     # Used only for debugging -- to be removed or commented out
+    #     return str([donor.__repr__() for donor in self._donors])
 
     def __contains__(self, donor_str):
         """Provide a method to check if donor (expects a str) is in donors."""
@@ -128,10 +133,11 @@ class Donors(object):
                     ]
         num = len(donors_L)
         donors_S = (("\n" + ", ".join(["{}"] * num)).format(*donors_L))
-        print(donors_S)
+        # print(donors_S)
 
     def create_report(self):
         """Create and print a report."""
+        # print("in create_report(): ", id(self._donors))
         report = ""
         title_line_form = "\n{:<26}{:^3}{:>13}{:^3}{:>13}{:^3}{:>13}\n"
         title_line_text = ('Donor Name', '|', 'Total Given', '|',
@@ -196,7 +202,7 @@ class StartMenu(object):
     def main_menu_dispatch(self):
         """Return a dispatch dict for the main menu."""
         return {"1": self.send_thank_you_sub_menu,
-                "2": self.donors.create_report,
+                "2": self.create_report,
                 "3": self.send_all_sub_menu,
                 "4": self.challenge,
                 "0": self.quit,
@@ -222,7 +228,7 @@ class StartMenu(object):
 
     def send_thank_you_dispatch(self):
         """Return a dispatch dict for the send-thank-you sub-menu."""
-        return {"1": self.donors.print_donor_names,
+        return {"1": self.print_donor_names,
                 "2": self.new_donor_interaction,
                 "3": self.old_donor_interaction,
                 "0": self.quit,
@@ -237,6 +243,24 @@ class StartMenu(object):
                 "0 - Quit\n"
                 ">> "
                 )
+
+    def print_donor_names(self):
+        """Call donors.print_donor_names method."""
+        # When I call it directly from dispatch dict, it does not work
+        # 'cos, I assume, its value is evaluated once in the dispatch dict
+        # when the program first starts running
+        # and does not change later during the program execution
+        # and none of my tests catched this problem
+        self.donors.print_donor_names()
+
+    def create_report(self):
+        """Call donors.create_report method."""
+        # When I call it directly from dispatch dict, it does not work
+        # 'cos, I assume, its value is evaluated once in the dispatch dict
+        # when the program first starts running
+        # and does not change later during the program execution
+        # and none of my tests catched this problem
+        self.donors.create_report()
 
     def get_email(self, name, amount):
         """Return a str containing a thank-you email."""
@@ -266,6 +290,7 @@ class StartMenu(object):
                         donor = self.donors.get_donor(name)
                     except ValueError:  # name is a new donor - create him
                         self.donors.append(SingleDonor(name, donation_amount))
+                        # print("in input_donation() ", id(self.donors))
                     else:
                         donor.add_donation(donation_amount)
                     return True
@@ -385,10 +410,12 @@ class StartMenu(object):
             else:
                 if factor == 0:
                     return False
-                elif factor < 1:
-                    print("Input must not be less than 1")
+                elif factor <= 1:
+                    print("Input must be greater than 1")
                 else:
                     self.donors = self.donors.challenge(factor)
+                    # print(self.donors)
+                    # print(id(self.donors))
                     return True
 
 

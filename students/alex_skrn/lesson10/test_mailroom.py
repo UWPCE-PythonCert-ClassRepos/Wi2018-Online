@@ -88,12 +88,13 @@ def test_get_last_donation():
 def test_challenge_creates_instance_single_donor():
     """Test that challenge() returns the right type."""
     d1 = SingleDonor("Jesse Eisenberg", (5, 15))
-    assert type(d1.challenge(1)) == SingleDonor
+    assert type(d1.challenge(2)) == SingleDonor
 
 
 @pytest.mark.parametrize('inp, exception',
                          [(0, ValueError),
                           (0.41, ValueError),
+                          (1, ValueError),
                           (-1, ValueError),
                           (-3.5, ValueError),
                           ("a", ValueError),
@@ -107,10 +108,9 @@ def test_challenge_single_factor_wrong_input(inp, exception):
 
 
 @pytest.mark.parametrize('inp, expectation',
-                         [(1, [10, 30]),
-                          (1.5, [12.5, 37.5]),
-                          (2, [15, 45]),
-                          (2.4, [17, 51]),
+                         [(1.5, [7.5, 22.5]),
+                          (2, [10, 30]),
+                          (2.4, [12, 36]),
                           ]
                          )
 def test_challenge_single_factor_right_input(inp, expectation):
@@ -194,7 +194,7 @@ def test_append(donors):
 
 def test_challenge_collection_donors_create_right_type(donors):
     """Check that the method returns a Donors class object."""
-    d = donors.challenge(1)
+    d = donors.challenge(2)
     assert type(d) == Donors
     #
     # d1 = SingleDonor("Bill Murray", [125, 1.0])
@@ -204,15 +204,15 @@ def test_challenge_collection_donors_create_right_type(donors):
 
 def test_challenge_donors_right_output_donations(donors):
     """Check that the Donors class object has donors with correct donations."""
-    d = donors.challenge(1)
+    d = donors.challenge(2)
     assert d.get_donor("Bill Murray").donations == [250, 2]
     assert d.get_donor("Woody Harrelson").donations == [143, 2.5]
     assert d.get_donor("Jesse Eisenberg").donations == [199.98, 3.5]
 
     d2 = donors.challenge(1.5)
-    assert d2.get_donor("Bill Murray").donations == pytest.approx([312.5, 2.5])
-    assert d2.get_donor("Woody Harrelson").donations == pytest.approx([178.75, 3.125])
-    assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([249.975, 4.375])
+    assert d2.get_donor("Bill Murray").donations == pytest.approx([187.5, 1.5])
+    assert d2.get_donor("Woody Harrelson").donations == pytest.approx([107.25, 1.875])
+    assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([149.985, 2.625])
 
 ###############################
 # TESTS FOR THE STARTMENU CLASS
@@ -614,9 +614,9 @@ def test_start_menu_user_choose_match_donations(donors):
     # This simulates the user entering "0" to quit main_menu running at start,
     # but I guess a class instance that I create remains in place
     # so I can test its methods
-    # Then I test the challenge() method, where the user types a factor of 1
+    # Then I test the challenge() method, where the user types a factor of 2
     builtins.input = Mock()
-    builtins.input.side_effect = ["0", "1"]  # Multiple calls
+    builtins.input.side_effect = ["0", "2"]  # Multiple calls
 
     # Captures all print statements the class object generates, into a mock object
     with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
@@ -659,10 +659,10 @@ def test_start_menu_user_choose_match_donations_wrong_inputs():
 
             #  The method should generate the following print statements
             assert "Input must be a number" in mock_stdout.getvalue()
-            assert "Input must not be less than 1" in mock_stdout.getvalue()
+            assert "Input must be greater than 1" in mock_stdout.getvalue()
 
             #  These statements should be in the following order
-            assert mock_stdout.getvalue().index("number") < mock_stdout.getvalue().index("less than")
+            assert mock_stdout.getvalue().index("number") < mock_stdout.getvalue().index("greater than")
 
             # The method must return False when user enters 0 to quit
             assert res is False
