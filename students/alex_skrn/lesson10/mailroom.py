@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Mailroom - Lesson 9 - Object Orientation."""
+"""Mailroom - Lesson 10 - Functional."""
 import os
 import datetime
 import tkinter as tk
@@ -81,7 +81,6 @@ class SingleDonor(object):
         """Return the last donation."""
         return self._donations[-1]
 
-
     def challenge(self, factor, min_donation=None, max_donation=None):
         """Return a SingleDonor class object with modified donations.
 
@@ -117,10 +116,10 @@ class SingleDonor(object):
         #     else:
         #         return x
         #
-        # matched_donations = list(map(multiplication, self.donations))
+        # updated_donations = list(map(multiplication, self.donations))
 
         # Alternatively, with lambda
-        matched_donations = list(map(lambda x: x * factor
+        updated_donations = list(map(lambda x: x * factor
                                      if is_within_range(x)
                                      else x,
                                      self.donations
@@ -130,16 +129,17 @@ class SingleDonor(object):
 
         # The following also works fine and looks much simpler than map
         # As for filter, I couldn't find any use for it, 'cos it only produces
-        # a part of a list, while I need a complete list, otherwise
-        # I end up filtering out a part of old donations
-        #
-        # matched_donations = [x * factor
+        # a shorter list of donations, while I need a complete list, otherwise
+        # I end up filtering out a part of old donations and would have to
+        # recombine it with old donations
+        # updated_donations = [x * factor
         #                      if is_within_range(x)
         #                      else x
         #                      for x in self.donations
         #                      ]
 
-        return SingleDonor(self.name, matched_donations)
+        return SingleDonor(self.name, updated_donations)
+
 
 ##############
 # DONORS CLASS
@@ -305,7 +305,7 @@ class StartMenu(object):
                 )
 
     def print_donor_names(self):
-        """Call donors.print_donor_names method."""
+        """Provide a wrapper method to call donors.print_donor_names."""
         # When I call it directly from dispatch dict, it does not work
         # 'cos, I assume, its value is evaluated once in the dispatch dict
         # when the program first starts running
@@ -313,7 +313,7 @@ class StartMenu(object):
         self.donors.print_donor_names()
 
     def create_report(self):
-        """Call donors.create_report method."""
+        """Provide a wrapper method to call donors.create_report method."""
         # When I call it directly from dispatch dict, it does not work
         # 'cos, I assume, its value is evaluated once in the dispatch dict
         # when the program first starts running
@@ -456,13 +456,12 @@ class StartMenu(object):
         print("\nAll letters saved in {}\n".format(target_dir))
 
     # Matching donations
-    def get_user_input(self, msg, factor=False):
+    def validate_user_input(self, msg, factor=False):
         """Helper functon for the challenge method."""
         while True:
             value = input(msg)
             if value == "" and not factor:  # User hits Enter to skip
-                value = "skip"
-                return value
+                return None
             else:
                 try:
                     value = float(value)
@@ -477,42 +476,39 @@ class StartMenu(object):
                         return value
 
     def challenge(self, projection=False):
-        """Increase some or all of donations by a factor, subj. to min/max."""
+        """Update self.donors or return total project contibution.
+
+        Increase some or all of donations by a factor, subj. to min/max.
+        If run in projection mode, return total contribution for the relevant
+        scenario.
+        """
         if projection:
             print("(This is a projection)")
         else:
             print("(This is NOT a projection!)")
-        factor = self.get_user_input(("Type a matching factor > 1 "
-                                      "or 0 to quit >>> "),
-                                     factor=True)
-        if not factor:  # User chooses to quit this sub-menu
+        factor = self.validate_user_input(("Type a matching factor > 1 "
+                                           "or 0 to quit >>> "),
+                                          factor=True)
+        if factor is False:  # User chooses to quit this sub-menu
             return False
 
-        min = self.get_user_input(("Type MIN donation, "
-                                   "0 to quit, "
-                                   "or Enter to skip >>> "))
-        if not min:  # User chooses to quit this sub-menu
+        minim = self.validate_user_input(("Type MIN donation, "
+                                          "0 to quit, "
+                                          "or Enter to skip >>> "))
+        if minim is False:  # User chooses to quit this sub-menu
             return False
 
-        max = self.get_user_input(("Type MAX donation, "
-                                   "0 to quit, "
-                                   "or Enter to skip >>> "))
-        if not max:  # User chooses to quit this sub-menu
+        maxim = self.validate_user_input(("Type MAX donation, "
+                                          "0 to quit, "
+                                          "or Enter to skip >>> "))
+        if maxim is False:  # User chooses to quit this sub-menu
             return False
 
-        # User may wish not to indicate min or max or both
-        if min != "skip" and max != "skip":
-            result = self.donors.challenge(factor,
-                                           min_donation=min,
-                                           max_donation=max
-                                           )
-        elif min != "skip":
-            result = self.donors.challenge(factor, min_donation=min)
-        elif max != "skip":
-            result = self.donors.challenge(factor, max_donation=max)
-        else:
-            result = self.donors.challenge(factor)
-        # Either run in projection or live mode
+        result = self.donors.challenge(factor,
+                                       min_donation=minim,
+                                       max_donation=maxim
+                                       )
+
         if projection:
             return result.get_total() - self.donors.get_total()
         else:
@@ -523,7 +519,8 @@ class StartMenu(object):
     def run_projection(self):
         """Get user input and return a projected amount of donations."""
         estimate = self.challenge(projection=True)
-        print("\nYou contribution would total ${:.2f}".format(estimate))
+        if estimate > 0:
+            print("\nYour contribution would total ${:.2f}".format(estimate))
 
 
 # Load data and run
