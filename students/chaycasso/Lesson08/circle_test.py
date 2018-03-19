@@ -33,5 +33,16 @@ class CircleTest(unittest.TestCase):
         c = cir.Circle.from_diameter(8)
         assert c.radius == 4.0
 
+    def test_str(self):
+        c = cir.Circle(4)
+        print(c)
+
+    def test_repr(self):
+        c = cir.Circle(4)
+        print (repr(c))
+        assert repr(c) == "Circle(4)"
+
+
+
 if __name__ == '__main__':
     unittest.main()

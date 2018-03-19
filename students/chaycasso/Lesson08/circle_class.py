@@ -41,4 +41,7 @@ class Circle(object):
         return self._radius * 2 * pi
 
     def __str__(self):
-        pass
+        return "Circle with radius: " + str(self.radius)
+
+    def __repr__(self):
+        return "Circle(%r)" % (self.radius)
