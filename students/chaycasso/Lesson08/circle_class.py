@@ -5,11 +5,19 @@
 # 3/19/2018
 # Creates various properties of a circle.
 
+from math import pi
+
 
 class Circle(object):
 
-    def __init__(self, the_radius=0):
+    def __init__(self, the_radius = 0):
         self._radius = the_radius
+
+    @classmethod
+    def from_diameter(cls, value):
+        self = cls()
+        self._radius = value / 2
+        return self
 
     @property
     def radius(self):
@@ -26,4 +34,11 @@ class Circle(object):
 
     @diameter.setter
     def diameter(self, value):
-        self.radius = value / 2
+        self._radius = value / 2
+
+    @property
+    def area(self):
+        return self._radius * 2 * pi
+
+    def __str__(self):
+        pass
