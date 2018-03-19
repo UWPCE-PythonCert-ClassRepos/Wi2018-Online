@@ -14,14 +14,14 @@ def load_file():
     return output_txt
 
 
-def trigram_list(stuff, i=0):
+def tri_list(stuff, i=0):
     print("Your word count is: " + str(len(stuff)))
     while len(stuff[i:i+3]) == 3:
         yield stuff[i:i+3]
         i += 1
 
 
-def trigram_story(stuff, i=0):
+def tri_story(stuff, i=0):
     new_list = []
     while len(stuff[i:i + 3]) == 3:
         new_list.append(stuff[i+2:i + 3])
@@ -32,7 +32,7 @@ def trigram_story(stuff, i=0):
 # -- Presentation --
 if __name__ == '__main__':
     file_data = load_file()
-    trigram = trigram_list(file_data.split())
+    trigram = tri_list(file_data.split())
     print(list(trigram))
-    print(trigram_story(file_data.split()))
+    print(tri_story(file_data.split()))
 
