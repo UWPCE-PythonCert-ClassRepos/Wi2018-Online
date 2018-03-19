@@ -45,3 +45,11 @@ class Circle(object):
 
     def __repr__(self):
         return "Circle(%r)" % (self.radius)
+
+    def __add__(self, other):
+        return Circle(self.radius + other.radius)
+
+    def __mul__(self, other):
+        if type(self) == str:
+            return Circle(self * other.radius)
+        else: return Circle(self.radius * other)
