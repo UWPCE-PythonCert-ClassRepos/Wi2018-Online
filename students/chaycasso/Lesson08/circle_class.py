@@ -53,3 +53,12 @@ class Circle(object):
         if type(self) == str:
             return Circle(self * other.radius)
         else: return Circle(self.radius * other)
+
+    def __gt__(self, other):
+        return self.radius > other.radius
+
+    def __lt__(self, other):
+        return self.radius < other.radius
+
+    def __eq__(self, other):
+        return self.radius == other.radius
