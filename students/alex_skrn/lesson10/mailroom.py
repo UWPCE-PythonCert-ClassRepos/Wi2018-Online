@@ -3,7 +3,6 @@
 """Mailroom - Lesson 10 - Functional."""
 import os
 import datetime
-from itertools import filterfalse, tee
 import tkinter as tk
 from tkinter import filedialog
 
@@ -104,7 +103,7 @@ class SingleDonor(object):
 
         # Helper function.
         def is_within_range(x):
-            """Return True if x is within min-max, True if min-max undefined."""
+            """Return True if x is within min-max or min-max are undefined."""
             if min_donation is not None and max_donation is not None:
                 return min_donation < x < max_donation
             elif min_donation is not None:
@@ -114,6 +113,17 @@ class SingleDonor(object):
             else:
                 return True
 
+        # As for using map, the following works fine, but looks worse
+        # than just using list comprehension below, even if I use lambda.
+        # def multiplication(x):
+        #     if is_within_range(x):
+        #         return x * factor
+        #     else:
+        #         return x
+        #
+        # updated_donations = list(map(multiplication, self.donations))
+
+        # Alternatively, with lambda
         updated_donations = list(map(lambda x: x * factor
                                      if is_within_range(x)
                                      else x,
@@ -121,6 +131,17 @@ class SingleDonor(object):
                                      )
 
                                  )
+
+        # The following also works fine and looks much simpler than map
+        # As for filter, I couldn't find any use for it, 'cos it only produces
+        # a shorter list of donations, while I need a complete list, otherwise
+        # I end up filtering out a part of old donations and would have to
+        # recombine it with old donations
+        # updated_donations = [x * factor
+        #                      if is_within_range(x)
+        #                      else x
+        #                      for x in self.donations
+        #                      ]
 
         if projection:
             return sum(updated_donations) - sum(self.donations)
@@ -207,12 +228,12 @@ class Donors(object):
                   projection=False):
         """Return a new Donors class object or a projected sum."""
         result = [donor.challenge(factor,
-                                      min_donation,
-                                      max_donation,
-                                      projection
-                                      )
-                            for donor in self._donors
-                            ]
+                                  min_donation,
+                                  max_donation,
+                                  projection
+                                  )
+                  for donor in self._donors
+                  ]
         if projection:
             return sum(result)
         else:
