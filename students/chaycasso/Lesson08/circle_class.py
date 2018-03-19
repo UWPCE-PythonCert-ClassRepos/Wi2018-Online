@@ -62,3 +62,9 @@ class Circle(object):
 
     def __eq__(self, other):
         return self.radius == other.radius
+
+    def __iadd__(self, other):
+        return Circle(self.radius + other)
+
+    def __imul__(self, other):
+        return Circle(self.radius * other)

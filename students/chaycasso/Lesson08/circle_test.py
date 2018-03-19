@@ -83,6 +83,18 @@ class CircleTest(unittest.TestCase):
         a.sort()
         assert a == [cir.Circle(0), cir.Circle(1), cir.Circle(2), cir.Circle(3), cir.Circle(4), cir.Circle(5), cir.Circle(6), cir.Circle(7), cir.Circle(8), cir.Circle(9)]
 
+    def test_iadd(self):
+        c1 = cir.Circle(2)
+        c2 = cir.Circle(4)
+        c2 += 2
+        c3 = cir.Circle(6)
+        assert c2.radius == c3.radius
+
+    def test_imul(self):
+        c2 = cir.Circle(4)
+        c4 = cir.Circle(12)
+        c4 *= 3
+        assert c4.radius == 36
 
 if __name__ == '__main__':
     unittest.main()
