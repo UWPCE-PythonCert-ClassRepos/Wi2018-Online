@@ -3,6 +3,9 @@
 #Mailroom Part 2
 #03-04-2018
 
+import sys
+
+
 donations = {'Shayna Hill': [50, 50, 50], 'Brandon Aleson': [200],
         'Lisa Rodriguez': [10, 20], 'Marge Simpson': [100],
         'Charlie Smith': [4]}
@@ -17,29 +20,41 @@ def report():
         print('{:20}    ${:12.2f}{:>12}     ${:>12.2f}'.format(donor,
             sum(donation), len(donation), sum(donation)/len(donation)))
 
+    print("\n")
+
 def thank_you():
-    name = input('Full Name:')
-    while name == 'list':
-        print(name_list)
+    while True: 
         name = input('Full Name:')
-        continue
-    donation = int(input('Donation Amount:'))
-    if name in name_list:
-        donations[name].append(donation)  
-    else: 
-        donations[name] = donation
-    nl = '\n'
-    print(f'Dear {name},{nl}Thank you so much for your donation of ${donation}. We appreciate your continual support. {nl}Best,{nl}Shayna')
+        if name == 'list':
+            print(name_list)
+            continue
+        donation = int(input('Donation Amount:'))
+        if name in name_list:
+            donations[name].append(donation)  
+        else: 
+            donations[name] = donation
+        
+        print(f'Dear {name},\nThank you so much for your donation of ${donation}. We appreciate your continual support.\nBest,\nShayna\n')
+        break
 
-#def main():
-response = input('Would you like to "Send a Thank You", "Create a Report", or "quit"?')
+#def send_letters():
+#    print('letters')
 
-menu_choice = {'quit': quit, 'Send a Thank You': thank_you, 'Create a Report': report}
+def main():
+    menu_choice = {
+        1: thank_you,
+        2: report,
+        3: sys.exit
+    }
 
-while response != 'quit': 
-    menu_choice.get(response)()
-    response = input('Would you like to "Send a Thank You", "Create a Report", or "quit"?')
+    while True:
+        response = input('Would you like to:\n1. Send a Thank You\n2. Create a Report\n3. Quit\n>')
+        
+        if response in ("1", "2", "3"):
+            menu_choice.get(int(response))()
+        else:
+            print("Invalid Selection")
+        
 
-#if __name__ == "__main__":
-#    main()
-    
+if __name__ == "__main__":
+    main()
