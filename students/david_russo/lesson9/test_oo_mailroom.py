@@ -2,6 +2,7 @@
 
 import oo_mailroom as oo_mr
 import unittest
+from unittest.mock import patch
 
 class oo_mailroom_test(unittest.TestCase):
 
@@ -52,7 +53,19 @@ class oo_mailroom_test(unittest.TestCase):
 		self.assertEqual(donor_list2.donor_list, ["Sherm"])
 
 	# test 8
-	def test_send_a_thank_you(self):
+	@patch()
+	def test_receive_input(self):
+		with mock.patch('__builtin__.input', return_value = 'Earl'):
+			donor_7a = oo_mr.Donor("Earl")
+			donor_7b = oo_mr.Donor("Thomas")
+			donor_7c = oo_mr.Donor("Wagner")
+			donor_list3 = oo_mr.DonorList()
+			donor_list3.add_donor(donor_7a)
+			donor_list3.add_donor(donor_7b)
+			donor_list3.add_donor(donor_7c)
+			self.assertEqual(donor_list3.receive_thank_you_card_recepient_input(), "Earl")
+
+
 
 
 

@@ -39,10 +39,38 @@ class DonorList():
 		self.donors[new_donor.name] = new_donor
 
 	def receive_thank_you_card_recepient_input(self):
-		return(str(input("To whom would you like to send a thank you? > \n")))
+		recipient = str(input("To whom would you like to send a thank you? > "))
+		while recipient == "list":
+			print(self.donor_list)
+			print("\n")
+			recipient = str(input("To whom would you like to send a thank you? > "))
+		return(recipient)
+
+	def receive_donation_amount(self):
+		while True:
+			donation_amount = input("How much would you like to donate? > ")
+			try:
+				donation_amount = float(donation_amount)
+				if donation_amount < 0.00:
+					print("You must enter a positive number to donate. ")
+					continue
+				break
+			except ValueError:
+				print("You must enter a numeric value. > ")
+		return(donation_amount)
 
 	def send_a_thank_you(self):
-		recipient = receive_thank_you_card_recepient_input()
+		recipient = self.receive_thank_you_card_recepient_input()
+		donation_amount = self.receive_donation_amount()
+		self.donors.setdefault(recipient, Donor(recipient)).add_donation(donation_amount)
+		print("Dear {:s},".format(recipient))
+		print("Thank you for your generous donations totaling ${:.2f}".format(*[x.total_donations for i,x in enumerate(self.donors.values()) if x.name == recipient]))
+		print("Best, The Donation Foundation.")
+
+
+
+
+		
 
 
 
