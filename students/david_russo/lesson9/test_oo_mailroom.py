@@ -3,6 +3,9 @@
 import oo_mailroom as oo_mr
 import unittest
 from unittest.mock import patch
+from unittest import mock
+import io
+import sys
 
 class oo_mailroom_test(unittest.TestCase):
 
@@ -53,17 +56,42 @@ class oo_mailroom_test(unittest.TestCase):
 		self.assertEqual(donor_list2.donor_list, ["Sherm"])
 
 	# test 8
-	@patch()
-	def test_receive_input(self):
-		with mock.patch('__builtin__.input', return_value = 'Earl'):
-			donor_7a = oo_mr.Donor("Earl")
-			donor_7b = oo_mr.Donor("Thomas")
-			donor_7c = oo_mr.Donor("Wagner")
-			donor_list3 = oo_mr.DonorList()
-			donor_list3.add_donor(donor_7a)
-			donor_list3.add_donor(donor_7b)
-			donor_list3.add_donor(donor_7c)
-			self.assertEqual(donor_list3.receive_thank_you_card_recepient_input(), "Earl")
+	@patch('builtins.input', return_value = "Earl")
+	def test_receive_input(self, input):
+		donor_list3 = oo_mr.DonorList()
+		answer = donor_list3.receive_thank_you_card_recepient_input()
+		self.assertEqual(answer, "Earl")
+
+	# test 9
+	@patch('builtins.input', create = True)
+	def test_send_a_thank_you(self, mocked_input):
+		mocked_input.side_effect = ['Earl', 400]
+		donor_list4 = oo_mr.DonorList()
+		donor_list4.add_donor(oo_mr.Donor("Earl"))
+		out = io.StringIO()
+		donor_list4.send_a_thank_you(out=out)
+		output = out.getvalue().strip()
+		self.assertEqual("Dear Earl, \nThank you for your generous donations totaling $400.00. \nBest, The Donation Foundation", output)
+
+	# test 10
+	def test_create_a_report(self):
+		donor7 = Donor("Wagner")
+		donor7.add_donation(50)
+		donor7.add_donation(100)
+		donor7.add_donation(210)
+		donor8 = Donor("Griffin")
+		donor8.add_donation(100)
+		donor8.add_donation(200)
+		donor8.add_donation(420)
+		donor_list5 = DonorList()
+		donor_list5.add_donor(donor7)
+		donor_list5.add_donor(donor8)
+		out = io.StringIO()
+		donor_list5.create_a_report(out=out)
+		output = out.getvalue().strip()
+		self.assertEqual("Donor Name          | Total Given | Num Gifts | Average Gift Size ", output)
+
+
 
 
 
