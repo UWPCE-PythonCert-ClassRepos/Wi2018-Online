@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-"""Mailroom - Lesson 10 - Functional."""
+"""Mailroom - Lesson 10 - Functional? -- one use of map and filter."""
 import os
 import datetime
 import tkinter as tk
@@ -81,64 +81,59 @@ class SingleDonor(object):
         """Return the last donation."""
         return self._donations[-1]
 
-    def challenge(self, factor, min_donation=None, max_donation=None):
-        """Return a SingleDonor class object with modified donations.
+    def challenge(self,
+                  factor,
+                  min_donation,
+                  max_donation,
+                  projection):
+        """Return a SingleDonor class object or the projected contribution.
 
         Either multiply all donations by the factor, or
-        multiply only those donations which are above min_donation and/or
-        below max_donation, if any of these parameters are provided,
-        while those donations which are outside the min-max range remains
-        unchanged.
-        Raise ValueError if factor is a str or <= 1, or if min or max is a str.
+        multiply only those donations which are above min_donation or
+        below max_donation, if any of these parameters is provided,
+        while the remaining donations remain unchanged.
+        If the projection is True, return the projected contribution.
         """
+        # Several safeguards
         if type(factor) is str or factor <= 1:
             raise ValueError("Factor must be a number > 1")
         elif type(min_donation) is str or type(max_donation) is str:
             raise ValueError("Input must be a number")
+        elif min_donation is not None and max_donation is not None:
+            raise ValueError("Min and max must not be both defined")
 
         # Helper function.
-        def is_within_range(x):
-            """Return True if x is within min-max or min-max are undefined."""
-            if min_donation is not None and max_donation is not None:
-                return min_donation < x < max_donation
-            elif min_donation is not None:
+        def subject_to_increase(x):
+            """Return True if x above min /below max or if min/max undefined."""
+            if min_donation is not None:
                 return x > min_donation
             elif max_donation is not None:
                 return x < max_donation
             else:
                 return True
 
-        # As for using map, the following works fine, but looks worse
-        # than just using list comprehension below, even if I use lambda.
-        # def multiplication(x):
-        #     if is_within_range(x):
-        #         return x * factor
-        #     else:
-        #         return x
-        #
-        # updated_donations = list(map(multiplication, self.donations))
-
-        # Alternatively, with lambda
+        # The only reason for the following ugly construct is because
+        # I couldn't imagine how to structure my solution to use map/filter
+        some_donations = list(filter(subject_to_increase, self.donations))
         updated_donations = list(map(lambda x: x * factor
-                                     if is_within_range(x)
+                                     if x in some_donations
                                      else x,
                                      self.donations
                                      )
-
                                  )
 
-        # The following also works fine and looks much simpler than map
-        # As for filter, I couldn't find any use for it, 'cos it only produces
-        # a shorter list of donations, while I need a complete list, otherwise
-        # I end up filtering out a part of old donations and would have to
-        # recombine it with old donations
+        # The following does the same as above but looks much clearer
         # updated_donations = [x * factor
-        #                      if is_within_range(x)
+        #                      if subject_to_increase(x)
         #                      else x
         #                      for x in self.donations
         #                      ]
 
-        return SingleDonor(self.name, updated_donations)
+        # projected contribution = increased donationed minus old donations
+        if projection:
+            return sum(updated_donations) - sum(self.donations)
+        else:
+            return SingleDonor(self.name, updated_donations)
 
 
 ##############
@@ -213,15 +208,23 @@ class Donors(object):
         report += "\n"
         print(report)
 
-    def challenge(self, factor, min_donation=None, max_donation=None):
-        """Return a new Donors class object."""
-        donors = [donor.challenge(factor,
+    def challenge(self,
+                  factor,
+                  min_donation,
+                  max_donation,
+                  projection):
+        """Return a new Donors class object or a projected sum."""
+        result = [donor.challenge(factor,
                                   min_donation,
-                                  max_donation
+                                  max_donation,
+                                  projection
                                   )
                   for donor in self._donors
                   ]
-        return Donors(donors)
+        if projection:
+            return sum(result)
+        else:
+            return Donors(result)
 
     def get_total(self):
         """Return the aggregate amount of donations for all donors."""
@@ -457,10 +460,10 @@ class StartMenu(object):
 
     # Matching donations
     def validate_user_input(self, msg, factor=False):
-        """Helper functon for the challenge method."""
+        """Helper functon for challenge method to get factor, min or max."""
         while True:
             value = input(msg)
-            if value == "" and not factor:  # User hits Enter to skip
+            if value == "" and not factor:  # User hits Enter to skip min/max
                 return None
             else:
                 try:
@@ -478,43 +481,45 @@ class StartMenu(object):
     def challenge(self, projection=False):
         """Update self.donors or return total project contibution.
 
-        Increase some or all of donations by a factor, subj. to min/max.
-        If run in projection mode, return total contribution for the relevant
-        scenario.
+        Increase some or all of donations by a factor, subj. to min or max.
+        If run in projection mode, return total expected contribution.
         """
         if projection:
             print("(This is a projection)")
         else:
             print("(This is NOT a projection!)")
+        # factor: False or float > 1
         factor = self.validate_user_input(("Type a matching factor > 1 "
                                            "or 0 to quit >>> "),
                                           factor=True)
         if factor is False:  # User chooses to quit this sub-menu
             return False
 
+        # minim: False, None, or float (except 0.0)
         minim = self.validate_user_input(("Type MIN donation, "
                                           "0 to quit, "
                                           "or Enter to skip >>> "))
         if minim is False:  # User chooses to quit this sub-menu
             return False
 
-        maxim = self.validate_user_input(("Type MAX donation, "
-                                          "0 to quit, "
-                                          "or Enter to skip >>> "))
-        if maxim is False:  # User chooses to quit this sub-menu
-            return False
+        if minim is None:  # User may choose only min or max, not both
+            maxim = self.validate_user_input(("Type MAX donation, "
+                                              "0 to quit, "
+                                              "or Enter to skip >>> "))
+            if maxim is False:  # User chooses to quit this sub-menu
+                return False
+        else:
+            maxim = None
 
-        result = self.donors.challenge(factor,
-                                       min_donation=minim,
-                                       max_donation=maxim
-                                       )
+        # result: a number or a Donors class object
+        result = self.donors.challenge(factor, minim, maxim, projection)
 
         if projection:
-            return result.get_total() - self.donors.get_total()
+            return result
         else:
             self.donors = result
 
-        return True
+        # return True
 
     def run_projection(self):
         """Get user input and return a projected amount of donations."""
