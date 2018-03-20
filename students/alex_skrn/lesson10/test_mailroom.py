@@ -76,19 +76,11 @@ def test_get_last_donation():
     assert d1.get_last_donation() == 125
     assert d2.get_last_donation() == 1.75
 
-# @pytest.mark.parametrize("test_input,expected", [
-#     ("3+5", 8),
-#     ("2+4", 6),
-#     ("6*9", 42),
-# ])
-# def test_eval(test_input, expected):
-#     assert eval(test_input) == expected
-
 
 def test_challenge_creates_instance_single_donor():
     """Test that challenge() returns the right type."""
     d1 = SingleDonor("Jesse Eisenberg", (5, 15))
-    assert type(d1.challenge(2)) == SingleDonor
+    assert type(d1.challenge(2, None, None, False)) == SingleDonor
 
 
 @pytest.mark.parametrize('inp, exception',
@@ -104,11 +96,11 @@ def test_challenge_single_factor_wrong_input(inp, exception):
     """Raise ValueError if the factor is wrong: negative or less than 1."""
     d1 = SingleDonor("Jesse Eisenberg", (5, 15))
     with pytest.raises(exception):
-        d1.challenge(inp)
+        d1.challenge(inp, None, None, False)
 
 def test_challenge_one_max_input():
     d1 = SingleDonor("Bill Murray", [125, 1.0])
-    updated_donor = d1.challenge(2, max_donation=100)
+    updated_donor = d1.challenge(2, None, 100, False)
     assert sum(updated_donor.donations) == 127
 
 @pytest.mark.parametrize('inp, expectation',
@@ -120,60 +112,46 @@ def test_challenge_one_max_input():
 def test_challenge_single_factor_right_input(inp, expectation):
     """Test that the donations property is updated correctly."""
     d1 = SingleDonor("Jesse Eisenberg", (5, 15))
-    updated_donor = d1.challenge(inp)
+    updated_donor = d1.challenge(inp, None, None, False)
     assert len(d1.donations) == len(updated_donor.donations)
     assert updated_donor.donations == expectation
 
-@pytest.mark.parametrize('factor, min, expected',
+@pytest.mark.parametrize('factor, minim, expected',
                          [(1.5, 2, [7.5, 9, 10.5, 15, 22.5, 1, 2]),
                           (2, 7, [20, 30, 1, 2, 5, 6, 7]),
                           ]
                          )
-def test_challenge_min_filter(factor, min, expected):
+def test_challenge_min_filter(factor, minim, expected):
     """Test that only donations above min are multipled."""
     d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
-    updated_donor = d1.challenge(factor, min_donation=min)
+    updated_donor = d1.challenge(factor, minim, None, False)
     assert len(d1.donations) == len(updated_donor.donations)
     assert sum(updated_donor.donations) == sum(expected)
 
 
-@pytest.mark.parametrize('factor, max, expected',
+@pytest.mark.parametrize('factor, maxim, expected',
                          [(1.5, 5, [1.5, 3, 5, 6, 7, 10, 15]),
                           (2, 10, [2, 4, 10, 12, 14, 10, 15]),
                           ]
                          )
-def test_challenge_max_filter(factor, max, expected):
+def test_challenge_max_filter(factor, maxim, expected):
     """Test that only donations below max are multiplied."""
     d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
-    updated_donor = d1.challenge(factor, max_donation=max)
+    updated_donor = d1.challenge(factor, None, maxim, False)
     assert len(d1.donations) == len(updated_donor.donations)
     assert updated_donor.donations == expected
 
 
-@pytest.mark.parametrize('factor, min, max, expected',
-                         [(1.5, 5, 10, [9, 10.5, 1, 2, 5, 10, 15]),
-                          (2, 2, 10, [10, 12, 14, 1, 2, 10, 15]),
+@pytest.mark.parametrize('factor, minim, maxim, expected',
+                         [(2, None, "a", ValueError),
+                          (2, "a", None, ValueError),
                           ]
                          )
-def test_challenge_min_max_filter(factor, min, max, expected):
-    """Test that only donations above min and below max are multiplied."""
-    d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
-    updated_donor = d1.challenge(factor, min_donation=min, max_donation=max)
-    assert len(d1.donations) == len(updated_donor.donations)
-    assert sum(updated_donor.donations) == sum(expected)
-
-
-@pytest.mark.parametrize('factor, min, max, expected',
-                         [(2, 2, "a", ValueError),
-                          (2, "a", 2, ValueError),
-                          (2, "a", "a", ValueError),
-                          ]
-                         )
-def test_challenge_min_max_filter_wrong_input(factor, min, max, expected):
+def test_challenge_min_max_filter_wrong_input(factor, minim, maxim, expected):
     """Test wrong input for min-max parameters."""
     d1 = SingleDonor("Jesse Eisenberg", (1, 2, 5, 6, 7, 10, 15))
     with pytest.raises(expected):
-        updated_donor = d1.challenge(factor, min_donation=min, max_donation=max)
+        d1.challenge(factor, minim, maxim, False)
 
 
 ############################
@@ -250,37 +228,34 @@ def test_append(donors):
 
 def test_challenge_collection_donors_create_right_type(donors):
     """Check that the method returns a Donors class object."""
-    d = donors.challenge(2)
+    d = donors.challenge(2, None, None, False)
     assert type(d) == Donors
 
 
 def test_challenge_donors_right_output_donations(donors):
     """Check that the Donors class object has donors with correct donations."""
-    d = donors.challenge(2)
+    d = donors.challenge(2, None, None, False)
     assert d.get_donor("Bill Murray").donations == [250, 2]
     assert d.get_donor("Woody Harrelson").donations == [143, 2.5]
     assert d.get_donor("Jesse Eisenberg").donations == [199.98, 3.5]
 
-    d2 = donors.challenge(1.5)
+    d2 = donors.challenge(1.5, None, None, False)
     assert d2.get_donor("Bill Murray").donations == pytest.approx([187.5, 1.5])
     assert d2.get_donor("Woody Harrelson").donations == pytest.approx([107.25, 1.875])
     assert d2.get_donor("Jesse Eisenberg").donations == pytest.approx([149.985, 2.625])
 
-@pytest.mark.parametrize('name, min, max, expected',
+@pytest.mark.parametrize('name, minim, maxim, expected',
                          [("Bill Murray", None, 100, [125, 2]),
                           ("Bill Murray", 100, None, [250, 1]),
-                          ("Bill Murray", 70, 100, [125, 1]),
                           ("Woody Harrelson", None, 100, [143, 2.5]),
                           ("Woody Harrelson", 100, None, [71.5, 1.25]),
-                          ("Woody Harrelson", 70, 100, [143, 1.25]),
                           ("Jesse Eisenberg", None, 100, [199.98, 3.5]),
                           ("Jesse Eisenberg", 100, None, [99.99, 1.75]),
-                          ("Jesse Eisenberg", 70, 100, [199.98, 1.75]),
                           ]
                          )
-def test_challenge_donors_right_output_donations2(donors, name, min, max, expected):
+def test_challenge_donors_right_output_donations2(donors, name, minim, maxim, expected):
     """Check that the Donors class object has donors with correct donations."""
-    d = donors.challenge(2, min_donation=min, max_donation=max)
+    d = donors.challenge(2, minim, maxim, False)
     assert sum(d.get_donor(name).donations) == sum(expected)
 
 
@@ -397,39 +372,6 @@ def test_input_donation_zero(monkeypatch):
         # causing the program to return False
         monkeypatch.setattr('builtins.input', lambda _: "0")
         assert s.input_donation("any_name") is False
-
-
-# #  doesn't work
-# def test_append_donor_via_startmenu_class():
-#     """StartMenu.donors.append(SingleDonor(name, val)."""
-#     # Sample data - I am not using donors fixture here for clarity
-#     d1 = SingleDonor("Bill", [125])
-#     d2 = SingleDonor("Woody", [71.5, 1.25, 0.5])
-#     d3 = SingleDonor("Jesse", [99.99, 1.75, 16])
-#     all_donors = Donors([d1, d2, d3])
-#
-#     # This simulates the user entering "0" for quit on prompt
-#     # but I guess a class instance that I create later remains in place
-#     # so I can test its methods and properties
-#     builtins.input = Mock()
-#     builtins.input.side_effect = ["0"]
-#
-#     # Capture all print statements the class object generates, into a mock object
-#     with mock.patch('sys.stdout', new_callable=StringIO) as mock_stdout:
-#         # Instantitate a class object (though in reality this class never gets
-#         # assigned to a name)
-#         s = StartMenu(all_donors)
-#
-#         # This works
-#         assert s.donors.get_donor("Bill").get_last_donation() == 125
-#
-#         # # This does not work for some reason: append() does not add the donor
-#         # s.donors.append(SingleDonor("New Name", 999.99))
-#         # assert s.donors.get_donor("New name").get_last_donation() == 999.99
-#
-#         # But here append() works nevertheless!
-#         all_donors.append(SingleDonor("New", 0.99))
-#         assert all_donors.get_donor("New").get_last_donation() == 0.99
 
 
 def test_old_donor_interaction_user_input_zero(monkeypatch):
@@ -776,8 +718,7 @@ def test_start_menu_match_donations2(donors, name, expected):
 @pytest.mark.parametrize('user_input, expected',
                          [(["0", "2", "", ""], "300.49"),
                           (["0", "3", "50", ""], "592.98"),
-                          (["0", "2", "-1", "100"], "175.49"),
-                          # (["0", "2", "-1", "1"], "0"),
+                          (["0", "2", "", "100"], "175.49"),
                           ]
                          )
 def test_start_menu_projection(donors, user_input, expected):
@@ -788,7 +729,7 @@ def test_start_menu_projection(donors, user_input, expected):
     # Then run_projection is tested on several user input cases
     # eg. ["0", "2", "", ""] means to double all donations
     # ["0", "3", "50", ""] measn to triple donations over $50
-    # ["0", "2", "-1", "100"] means to double donations above -1 and under $100
+    # ["0", "2", "", "100"] means to double donations under $100
     builtins.input = Mock()
     builtins.input.side_effect = user_input
 
