@@ -137,6 +137,41 @@ class oo_mailroom_test(unittest.TestCase):
 
 		self.assertEqual([the_cb_post, the_lb_post], [[1000.0, 2000.0], [50000.0, 100000.0]])
 
+	# test 13
+	def test_challenge_donor_with_filter(self):
+		# create a donor object and add some donations
+		walt = fp_mr.Donor("Walt")
+		walt.add_donation(99)
+		walt.add_donation(150)
+		walt.add_donation(201)
+
+		# filter out all donations less than 100 and greater than 200
+		walt_post_filter = walt.challenge(inflation_factor = 1, min_donations = 100, max_donations = 200)
+		self.assertEqual(walt_post_filter.donations, [150.00])
+
+	def test_challenge_donor_with_filter_db(self):
+		# create two donors with some donations		
+		the_cb = fp_mr.Donor("Griffin")
+		the_cb.add_donation(2000)
+		the_cb.add_donation(5000)
+
+		the_lb = fp_mr.Donor("Wagner")
+		the_lb.add_donation(10000)
+		the_lb.add_donation(100)
+
+		# create a DonorList() and add the donors
+		defense = fp_mr.DonorList()
+		defense.add_donor(the_cb)
+		defense.add_donor(the_lb)
+
+		# filter out donations less than 1000 and greater than 6000
+		defense_post_challenge = defense.challenge_donors(inflation_factor = 1, min_donations = 1000, max_donations = 6000)
+
+		# get new donation lists
+		the_cb_post = list(defense_post_challenge.donors['Griffin'].donations)
+		the_lb_post = list(defense_post_challenge.donors['Wagner'].donations)
+
+		self.assertEqual([the_cb_post, the_lb_post], [[2000.0, 5000.0], []])		
 
 
 

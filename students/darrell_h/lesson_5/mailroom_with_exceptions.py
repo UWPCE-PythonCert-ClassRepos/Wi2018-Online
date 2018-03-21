@@ -1,4 +1,7 @@
 #!/usr/local/bin/python3
+"""This module does blah blah."""
+
+
 import datetime
 import os  # this is required to write files to ~/Downloads. os.path.expanduser
 
@@ -21,7 +24,7 @@ d = {'jack': [100, 200, 300, 400],
 
 
 def seperator(str):
-    # return line that equals string length ignoring newline.
+    """return line that equals string length ignoring newline."""
     return "-" * (len(str) - str.count('\n'))
 
 
@@ -127,6 +130,7 @@ def menu_selection(prompt, dispatch_dict):
             print('\n=========================\n'
                   '=== Invalid Selection ==='
                   '\n=========================')
+            # menu_selection(prompt, dispatch_dict)
             continue
 
 

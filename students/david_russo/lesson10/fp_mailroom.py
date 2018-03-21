@@ -26,10 +26,11 @@ class Donor():
 		except ValueError:
 			print("You must enter a numeric donation amount. ")
 
-	def challenge(self, inflation_factor):
+	def challenge(self, inflation_factor, min_donations = 0, max_donations = 999999999):
 		donor_post_challenge = Donor(self.name)
-		new_donations = list(map(lambda x: x*inflation_factor, self.donations))
-		for donation in new_donations:
+		self.donations = list(filter(lambda x: x >= min_donations and x <= max_donations, self.donations))
+		inflated_donations = list(map(lambda x: x*inflation_factor, self.donations))
+		for donation in inflated_donations:
 			donor_post_challenge.add_donation(donation)
 		return donor_post_challenge
 
@@ -111,10 +112,10 @@ class DonorList():
 			file.write("Best, The Donation Foundation")
 			file.close()
 
-	def challenge_donors(self, inflation_factor):
+	def challenge_donors(self, inflation_factor, *args, **kwargs):
 		donor_list_post_challenge = DonorList()
 		for current_donor in self.donors.values():
-			donor_list_post_challenge.add_donor(current_donor.challenge(inflation_factor = inflation_factor))
+			donor_list_post_challenge.add_donor(current_donor.challenge(inflation_factor = inflation_factor, *args, **kwargs))
 		return donor_list_post_challenge
 
 
