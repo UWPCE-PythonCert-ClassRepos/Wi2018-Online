@@ -6,6 +6,7 @@ from unittest.mock import patch
 from unittest import mock
 import io
 import sys
+import os
 
 class oo_mailroom_test(unittest.TestCase):
 
@@ -74,26 +75,30 @@ class oo_mailroom_test(unittest.TestCase):
 		self.assertEqual("Dear Earl, \nThank you for your generous donations totaling $400.00. \nBest, The Donation Foundation", output)
 
 	# test 10
-	def test_create_a_report(self):
-		donor7 = Donor("Wagner")
-		donor7.add_donation(50)
-		donor7.add_donation(100)
-		donor7.add_donation(210)
-		donor8 = Donor("Griffin")
-		donor8.add_donation(100)
-		donor8.add_donation(200)
-		donor8.add_donation(420)
-		donor_list5 = DonorList()
-		donor_list5.add_donor(donor7)
-		donor_list5.add_donor(donor8)
-		out = io.StringIO()
-		donor_list5.create_a_report(out=out)
-		output = out.getvalue().strip()
-		self.assertEqual("Donor Name          | Total Given | Num Gifts | Average Gift Size ", output)
+	def test_send_letters_to_everyone(self):		
+		# create cat and dog donors
+		cat = oo_mr.Donor("cat")
+		cat.add_donation(50)
+		cat.add_donation(50)
 
+		dog = oo_mr.Donor("dog")
+		# it's been a ruff year, only $2 in donations
+		dog.add_donation(1)
+		dog.add_donation(1)
 
+		# create a donor list and add the cat and dog donors
+		animal_donors = oo_mr.DonorList()
+		animal_donors.add_donor(cat)
+		animal_donors.add_donor(dog)
 
+		if(os.path.isfile("thank_you_cat.txt")):
+			os.remove("thank_you_cat.txt")
+		if(os.path.isfile("thank_you_dog.txt")):
+			os.remove("thank_you_dog.txt")
 
+		animal_donors.send_letters_to_everyone()
+
+		self.assertEqual(os.path.isfile("thank_you_cat.txt") & os.path.isfile("thank_you_dog.txt"), True)
 
 
 
