@@ -32,7 +32,7 @@ def thank_you():
         if name in name_list:
             donations[name].append(donation)  
         else: 
-            donations[name] = donation
+            donations[name] = [donation]
         
         print(f'Dear {name},\nThank you so much for your donation of ${donation}. We appreciate your continual support.\nBest,\nShayna\n')
         break
