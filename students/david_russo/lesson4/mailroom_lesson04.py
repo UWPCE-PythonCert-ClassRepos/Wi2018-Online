@@ -40,9 +40,9 @@ def send_a_thank_you():
     # prompt the user for a donation amount
     donation_amount = int(input("How much would you like to donate? > "))
     # add the donor and the donation amount to the donors list
-    donors.setdefault(donor, donation_amount)
+    donors.setdefault(donor, []).append(donation_amount)
     # Print the thank you note
-    print("Dear {:s}, \n Thank you for your generous donation of ${:.2f}. \n".format(donor, donation_amount),
+    print("Dear {:s}, \n Thank you for your generous donations totaling ${:.2f}. \n".format(donor, sum(donors[donor])),
           "Best, \n The Donation Foundation.")
 
 # define a function to create a donation report
@@ -65,8 +65,12 @@ def send_letters_to_everyone():
     for donor, donations in donors.items():
         thank_you_dict.setdefault(
             donor,
-            "Dear {:s}, \n\n. Thank you for your generous donations totalling ${:.2f}. \n\n Best, \n The Donation Foundation. \n\n".format(donor, sum(donations)))
-    print(thank_you_dict.values())
+            "Dear {:s}, \n\n Thank you for your generous donations totaling ${:.2f}. \n\n Best, \n The Donation Foundation. \n\n".format(donor, sum(donations)))
+        name_length = len(donor)
+        file = open("thank_you_{name:{width}}.txt".format(name = donor, width = name_length), "w")
+        file.write(thank_you_dict[donor])
+        file.close()
+    
 
         
 # define a function to quit the program
@@ -82,5 +86,5 @@ if __name__ == '__main__':
     3: send_letters_to_everyone,
     4: quit_program
     }
-
-    switch_response_dictionary.get(prompt_user())()
+    while True:
+        switch_response_dictionary.get(prompt_user())()

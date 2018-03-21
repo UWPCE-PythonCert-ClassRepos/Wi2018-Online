@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+import logging
+import logging.config
+
+#logging.cong file
+logging.config.fileConfig('logging.conf')
+# create logger
+logger = logging.getLogger('mailRoom')
 
 DONOR_LIST = {'Jim':[25.00,150.00,2000.00,100000.00],'Linda':[10000.25],'Bob':[5.03,100.01,6.00]}
 
@@ -85,9 +92,14 @@ def run():
 
 def main():
     try:
+        logging.basicConfig(filename='myapp.log', level=logging.INFO)
+        logging.info('Started Mailroom Program')
         run()
     except Exception as e:
         print ('error with task running program\n {}'.format(e))
+        logging.debug('error with task running program\n {}'.format(e))
+    finally:
+        logging.info('Finished Mailroom Program')
 
 if __name__ == "__main__":
     main()

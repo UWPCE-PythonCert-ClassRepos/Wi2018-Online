@@ -35,18 +35,23 @@ def get_donor_fullname(donor):
 def menu(menu_data):
     """
     Prints the main user menu & retrieves user selection.
-    :param: a menu dictionary, key as numbered list.
-            Dict key 0 should be a null function (or text for bad choice)
-            Dict value is a list with the following entries:
-                [0] = Text for user prompt
-                [1] = Function that should be run for that choice
-    :return: the function corresponding to the user's selection
+    :param: a menu list, consisting of tuples with two values:
+        [0]: text to be presented to user
+        [1]: function that should be called for the menu item
+    :return: the function corresponding to the user's selection, or None on a bad selection
+        raises ValueError if choice is non-numeric
     """
     print("\nPlease choose one of the following options:")
-    for n in range(1, len(menu_data)):                     # Start at item 1, item 0 should be null function
-        print(f"{n}) {menu_data[n][0]}")                   # Prints the menu user text
-    menu_entry = menu_data.get(int(input("> ")), menu_data[0])   # if bad option, returns item 0
-    return menu_entry[1]                                         # Returns the function from that menu choice's list
+
+    for index, menu_item in enumerate(menu_data):   # Prints the menu user text
+        print(f"{index + 1}) {menu_item[0]}")
+
+    choice = int(input("> ")) - 1
+
+    if choice in range(len(menu_data)):             # Ensure that option chosen is within menu range
+        return menu_data[choice][1]                 # this handles choosing 0, which would return menu_data[-1][1]
+
+    return None
 
 
 def generate_letter(donor):
@@ -81,9 +86,8 @@ def send_letters_all():
         now = time.localtime()
         f_name = f"{now.tm_year}{now.tm_mon:02}{now.tm_mday:02}_"
         f_name += get_donor_fullname(donor).replace(" ", "_") + ".txt"
-        file_out = open(f_name, 'w')
-        file_out.write(generate_letter(donor))
-        file_out.close()
+        with open(f_name, 'w') as file_out:
+            file_out.write(generate_letter(donor))
     return None
 
 
@@ -147,16 +151,18 @@ def print_report():
         print(f"$ {sum(dons):>10.2f}   {len(dons):>9}  ${sum(dons)/len(dons):>12.2f}")
 
 
-def nul():
-    pass
-
-
 if __name__ == "__main__":
-    menu_functions = {0: ['nul', nul],                      # could also use 'lambda: None' instead of nul
-                      1: ['Send a Thank You', send_thank_you],
-                      2: ['Print a report', print_report],
-                      3: ['Send letters to everyone', send_letters_all],
-                      4: ['Quit', quit],
-                      }
+
+    menu_functions = [
+        ('Send a Thank You', send_thank_you),
+        ('Print a report', print_report),
+        ('Send letters to everyone', send_letters_all),
+        ('Quit', quit),
+    ]
     while True:
-        menu(menu_functions)()
+        try:
+            menu(menu_functions)()
+        except TypeError:
+            continue
+        except ValueError:
+            continue

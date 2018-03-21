@@ -1,4 +1,7 @@
 #!/usr/local/bin/python3
+import datetime
+import os  # this is required to write files to ~/Downloads. os.path.expanduser
+
 
 ##############
 #    DATA    #
@@ -36,6 +39,23 @@ def add_donation(donor_name, exsting_donor):
             d[donor_name] = [int(donation)]
             break
 
+def send_to_screen():
+    for k, v in d.items():
+        print(f"thanks {k}")
+
+def send_to_file():
+    target_folder = '~/Downloads/'
+    now = datetime.datetime.now()
+    file_append = now.strftime("%Y-%m-%d")
+    for k,v in d.items():
+        f = open(os.path.expanduser(target_folder + k + file_append + '.txt'), "w+")  # w+ will create file and write
+        f.write(f"Dear {k}, thanks\n\n"
+                f"Your donation of ${'{:,}'.format(sum(v))} is appreciated\n\n"
+                 "It will be put to good use.\n\n"
+                 "THANKS")
+        f.close()
+
+
 
 #####################
 #  MAIN FUNCTIONS #
@@ -46,7 +66,15 @@ def sub_menu():
     options_dict = {'l': list_donors, 'q': quit}
     options_prompt = 'l - list donors\n'\
                      'q - return to main menu\n'
+    menu_selection(options_prompt, options_dict)
 
+
+def send_letters():
+    options_dict = {'s': send_to_screen, 'f': send_to_file, 'q': quit}
+    options_prompt = 's - send to screen\n'\
+                     'f - send to file\n'\
+                     'q - return to main menu\n'
+    menu_selection(options_prompt, options_dict)
 
 def send_thank_you():
     # donor_names = get_names()  # create a list of names only
@@ -96,14 +124,16 @@ def menu_selection(prompt, dispatch_dict):
 
 
 main_response_dict = {'1': send_thank_you,
-                      '3': sub_menu,
+                      's': sub_menu,
                       '2': create_report,
+                      '3': send_letters,
                       'q': quit}
 
 menu_prompt = '\nMAIN MENU\n'\
               '1 - send thank you\n'\
               '2 - create report\n'\
-              '3 - sub menu\n'\
+              '3 - send letters to everyone\n'\
+              's - sub menu\n'\
               'q - quit\n'
 
 
