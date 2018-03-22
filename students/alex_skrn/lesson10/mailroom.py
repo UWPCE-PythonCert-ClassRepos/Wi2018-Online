@@ -61,6 +61,17 @@ def print_donor_names(donors):
     print(donors_S)
 
 
+def get_email(name, amount):
+    """Return a str containing a thank-you email."""
+    email_text = ("""\nDear {},\n
+                  \nI would like to thank you for your donation of ${}.\n
+                  \nWe appreciate your support.\n
+                  \nSincerely,\n
+                  \nThe Organization\n
+                  """).format(name, amount)
+    return email_text
+
+
 def create_report(donors):
     """Create and print a report."""
     report = ""
@@ -148,17 +159,6 @@ def send_thank_you_sub_menu(donors):
             pass
 
 
-def get_email(name, amount):
-    """Return a str containing a thank-you email."""
-    email_text = ("""\nDear {},\n
-                  \nI would like to thank you for your donation of ${}.\n
-                  \nWe appreciate your support.\n
-                  \nSincerely,\n
-                  \nThe Organization\n
-                  """).format(name, amount)
-    return email_text
-
-
 def input_donation(donors, name):
     """Obtain the donation amount from the user."""
     prompt_amount = "Enter the donation amount or 0 to abort > "
@@ -185,7 +185,7 @@ def old_donor_interaction(donors, old=True):
         while name not in donors:
             name = input(prompt_name)
             if name == "0":
-                return
+                return False
     else:
         while True:
             name = input(prompt_name)
@@ -221,6 +221,7 @@ def send_all_sub_menu(donors):
             pass
 
 
+#  WRITE ALL LETTERS TO FILES
 def get_full_path(destination, name):
     """Construct a full path including date and name."""
     date = str(datetime.date.today())
@@ -277,6 +278,14 @@ def multiplier_factory(factor, min_donation, max_donation):
         Returns:
               a function which will multiply its argument by factor subject to conditions.
     """
+    # Several safeguards
+    if type(factor) is str or factor <= 1:
+        raise ValueError("Factor must be a number > 1")
+    elif type(min_donation) is str or type(max_donation) is str:
+        raise ValueError("Input must be a number")
+    elif min_donation is not None and max_donation is not None:
+        raise ValueError("Min and max must not be both defined")
+
     def func(value):
         def subject_to_increase(value):
             """Decide if the donation (the value must be increased)."""
@@ -297,14 +306,6 @@ def multiplier_factory(factor, min_donation, max_donation):
 
 def do_challenge(donors, factor, min_donation, max_donation, projection):
     """Return projected contribution (float) or an updated donor_db (dict)."""
-    # Several safeguards
-    if type(factor) is str or factor <= 1:
-        raise ValueError("Factor must be a number > 1")
-    elif type(min_donation) is str or type(max_donation) is str:
-        raise ValueError("Input must be a number")
-    elif min_donation is not None and max_donation is not None:
-        raise ValueError("Min and max must not be both defined")
-
     multiplier = multiplier_factory(factor, min_donation, max_donation)
     new_db = dict()
 
