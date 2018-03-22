@@ -2,6 +2,11 @@
 
 import oo_mailroom as oo_mr
 import unittest
+from unittest.mock import patch
+from unittest import mock
+import io
+import sys
+import os
 
 class oo_mailroom_test(unittest.TestCase):
 
@@ -52,7 +57,48 @@ class oo_mailroom_test(unittest.TestCase):
 		self.assertEqual(donor_list2.donor_list, ["Sherm"])
 
 	# test 8
-	def test_send_a_thank_you(self):
+	@patch('builtins.input', return_value = "Earl")
+	def test_receive_input(self, input):
+		donor_list3 = oo_mr.DonorList()
+		answer = donor_list3.receive_thank_you_card_recepient_input()
+		self.assertEqual(answer, "Earl")
+
+	# test 9
+	@patch('builtins.input', create = True)
+	def test_send_a_thank_you(self, mocked_input):
+		mocked_input.side_effect = ['Earl', 400]
+		donor_list4 = oo_mr.DonorList()
+		donor_list4.add_donor(oo_mr.Donor("Earl"))
+		out = io.StringIO()
+		donor_list4.send_a_thank_you(out=out)
+		output = out.getvalue().strip()
+		self.assertEqual("Dear Earl, \nThank you for your generous donations totaling $400.00. \nBest, The Donation Foundation", output)
+
+	# test 10
+	def test_send_letters_to_everyone(self):		
+		# create cat and dog donors
+		cat = oo_mr.Donor("cat")
+		cat.add_donation(50)
+		cat.add_donation(50)
+
+		dog = oo_mr.Donor("dog")
+		# it's been a ruff year, only $2 in donations
+		dog.add_donation(1)
+		dog.add_donation(1)
+
+		# create a donor list and add the cat and dog donors
+		animal_donors = oo_mr.DonorList()
+		animal_donors.add_donor(cat)
+		animal_donors.add_donor(dog)
+
+		if(os.path.isfile("thank_you_cat.txt")):
+			os.remove("thank_you_cat.txt")
+		if(os.path.isfile("thank_you_dog.txt")):
+			os.remove("thank_you_dog.txt")
+
+		animal_donors.send_letters_to_everyone()
+
+		self.assertEqual(os.path.isfile("thank_you_cat.txt") & os.path.isfile("thank_you_dog.txt"), True)
 
 
 

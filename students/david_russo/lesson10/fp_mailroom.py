@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import sys
-import oo_mailroom as oo_mr
 
 class Donor():
 
@@ -26,6 +25,15 @@ class Donor():
 			self.donations.append(float(amount))
 		except ValueError:
 			print("You must enter a numeric donation amount. ")
+
+	def challenge(self, inflation_factor, min_donations = 0, max_donations = 999999999):
+		donor_post_challenge = Donor(self.name)
+		self.donations = list(filter(lambda x: x >= min_donations and x <= max_donations, self.donations))
+		inflated_donations = list(map(lambda x: x*inflation_factor, self.donations))
+		for donation in inflated_donations:
+			donor_post_challenge.add_donation(donation)
+		return donor_post_challenge
+
 
 
 
@@ -103,6 +111,14 @@ class DonorList():
 			file.write("Thank you for your generous donations totaling ${:.2f}. \n".format(donor.total_donations))
 			file.write("Best, The Donation Foundation")
 			file.close()
+
+	def challenge_donors(self, inflation_factor, *args, **kwargs):
+		donor_list_post_challenge = DonorList()
+		for current_donor in self.donors.values():
+			donor_list_post_challenge.add_donor(current_donor.challenge(inflation_factor = inflation_factor, *args, **kwargs))
+		return donor_list_post_challenge
+
+
 
 if __name__ == '__main__':
 	# Create a switch dictionary
