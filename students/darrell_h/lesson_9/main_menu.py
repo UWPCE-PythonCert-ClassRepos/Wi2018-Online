@@ -1,4 +1,5 @@
 from mailroom_class_using_composition import Donor, Mailroom
+from seed_data import initial_data
 
 mailroom = Mailroom()
 
@@ -35,14 +36,7 @@ def start_menu():
 
 if __name__ == "__main__":
 
-    intial_data = {'jack': [100, 200, 300, 400],
-                   'mary': [3000, 5000],
-                   'frank': [29.50, 31],
-                   'jane': [3000, 5000],
-                   'scrouge': [1, 2, 3],
-                   'bob': [60000, 70000, 7668, 4]}
+    for k, v in initial_data.items():
+        mailroom.donor_collection[k] = Donor(k, v['lname'], v['donations'])
 
-    # load intial donors as objects into dictionary
-    for k, v in intial_data.items():
-        mailroom.donor_collection[k] = Donor(k, v)
     start_menu()

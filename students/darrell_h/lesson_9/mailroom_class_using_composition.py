@@ -5,10 +5,21 @@ class Donor():
     """
     total_donors = 0
 
-    def __init__(self, fname, donations=[]):
+    def __init__(self, fname, lname, donations=None):
         self.fname = fname
-        self.donations = donations
-        Donor.total_donors +=1
+        self.lname = lname
+        if donations is not None:
+            self.donations = donations
+        else:
+            self.donations = []
+
+        Donor.total_donors += 1
+
+    @property
+    def fullname(self):
+        return f'{self.fname} {self.lname}'
+
+
 
 class Mailroom(object):
     """
@@ -19,8 +30,8 @@ class Mailroom(object):
     def __init__(self):
         self.donor_collection = {}
 
-    def add_new_donor(self,fname, initial_donations=[]):
-        self.donor_collection[fname] = Donor(fname, initial_donations)
+    def add_new_donor(self,fname, lname, initial_donations=[]):
+        self.donor_collection[fname] = Donor(fname, lname, initial_donations)
 
     def list_donors(self):
         return "\n".join(self.donor_collection.keys())
@@ -29,7 +40,7 @@ class Mailroom(object):
         if fname in self.donor_collection.keys():
             self.donor_collection[fname].donations.append(donation)
         else:
-            self.add_new_donor(fname, donation)
+            raise ValueError('Donor not found')
 
     def sum_donations(self, fname):
         return sum(self.donor_collection.get(fname).donations)
@@ -54,20 +65,16 @@ class Mailroom(object):
 
 
 if __name__ == "__main__":
-    # should probably uses this for testing only and load as
-    # a module.
-    intial_data = {'jack': [100, 200, 300, 400],
-                   'mary': [3000, 5000],
-                   'frank': [29.50, 31],
-                   'jane': [3000, 5000],
-                   'scrouge': [1, 2, 3],
-                   'bob': [60000, 70000, 7668, 4]}
+
+    from seed_data import initial_data
 
     mailroom = Mailroom()
 
     # load intial donors as objects into dictionary
-    for k,v in intial_data.items():
-        mailroom.donor_collection[k] = Donor(k,v)
+    for k, v in initial_data.items():
+        mailroom.donor_collection[k] = Donor(k, v['lname'], v['donations'])
+
+    print(mailroom.donor_collection)
 
 
 
