@@ -1,0 +1,6 @@
+Dear Joan,
+
+Your gift of $[100, 50, 65] is greatly appreciated.
+
+Sincerely,
+Aron
