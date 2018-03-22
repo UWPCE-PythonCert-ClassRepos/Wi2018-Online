@@ -149,6 +149,7 @@ class oo_mailroom_test(unittest.TestCase):
 		walt_post_filter = walt.challenge(inflation_factor = 1, min_donations = 100, max_donations = 200)
 		self.assertEqual(walt_post_filter.donations, [150.00])
 
+	# test 14
 	def test_challenge_donor_with_filter_db(self):
 		# create two donors with some donations		
 		the_cb = fp_mr.Donor("Griffin")
@@ -171,7 +172,69 @@ class oo_mailroom_test(unittest.TestCase):
 		the_cb_post = list(defense_post_challenge.donors['Griffin'].donations)
 		the_lb_post = list(defense_post_challenge.donors['Wagner'].donations)
 
-		self.assertEqual([the_cb_post, the_lb_post], [[2000.0, 5000.0], []])		
+		self.assertEqual([the_cb_post, the_lb_post], [[2000.0, 5000.0], []])
+
+	# test 15
+	def test_challenge_donor_with_projection_under100(self):
+		# create a donor with some donations		
+		the_cb = fp_mr.Donor("Griffin")
+		the_cb.add_donation(50)
+		the_cb.add_donation(75)
+		the_cb.add_donation(787)
+		the_cb.add_donation(797)
+
+		# double contributions under 100
+		the_cb_projected = the_cb.challenge(inflation_factor = 2, max_donations = 100, projection = True)
+
+		self.assertEqual(the_cb_projected.donations, [100.0, 150.0, 787.0, 797.0])
+
+	# test 16
+	def test_challenge_donor_with_projection_over50(self):
+		# create a donor with some donations		
+
+		the_lb = fp_mr.Donor("Wagner")
+		the_lb.add_donation(25)
+		the_lb.add_donation(49)
+		the_lb.add_donation(130)
+		the_lb.add_donation(155)
+
+		# triple contributions over 50
+		the_lb_projected = the_lb.challenge(inflation_factor = 3, min_donations = 50, projection = True)
+
+		self.assertEqual(the_lb_projected.donations, [390.0, 465.0, 25.0, 49.0])
+
+	# test 17
+	def test_challenge_donor_db_with_projection_over50(self):
+		# create two donors with some donations		
+		the_cb = fp_mr.Donor("Griffin")
+		the_cb.add_donation(50)
+		the_cb.add_donation(75)
+		the_cb.add_donation(787)
+		the_cb.add_donation(797)
+
+		the_lb = fp_mr.Donor("Wagner")
+		the_lb.add_donation(25)
+		the_lb.add_donation(49)
+		the_lb.add_donation(130)
+		the_lb.add_donation(155)
+
+		# create a DonorList() and add the donors
+		defense = fp_mr.DonorList()
+		defense.add_donor(the_cb)
+		defense.add_donor(the_lb)
+
+		# project donor database where all contributions under 100 are doubled
+		defense_post_challenge = defense.challenge_donors(inflation_factor = 2, max_donations = 100, projection = True)
+
+		# get new donation lists
+		the_cb_post = list(defense_post_challenge.donors['Griffin'].donations)
+		the_lb_post = list(defense_post_challenge.donors['Wagner'].donations)
+
+		self.assertEqual([the_cb_post, the_lb_post], [[100.0, 150.0, 787, 797], [50.0, 98.0, 130.0, 155.0]])		
+
+
+
+
 
 
 

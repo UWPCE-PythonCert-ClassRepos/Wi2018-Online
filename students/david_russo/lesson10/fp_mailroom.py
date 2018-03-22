@@ -26,13 +26,35 @@ class Donor():
 		except ValueError:
 			print("You must enter a numeric donation amount. ")
 
-	def challenge(self, inflation_factor, min_donations = 0, max_donations = 999999999):
-		donor_post_challenge = Donor(self.name)
-		self.donations = list(filter(lambda x: x >= min_donations and x <= max_donations, self.donations))
-		inflated_donations = list(map(lambda x: x*inflation_factor, self.donations))
-		for donation in inflated_donations:
-			donor_post_challenge.add_donation(donation)
-		return donor_post_challenge
+	def challenge(self, inflation_factor, min_donations = -999999999, max_donations = 999999999, projection = False):
+		
+		if projection:
+
+			donor_projected = Donor(self.name)
+
+			donations_to_inflate = list(filter(lambda x: x > min_donations and x < max_donations, self.donations))
+			inflated_donations = list(map(lambda x: x*inflation_factor, donations_to_inflate))
+
+			unchanged_donations = list(filter(lambda x: x <= min_donations or x >= max_donations, self.donations))
+
+			for donation in inflated_donations+unchanged_donations:
+				donor_projected.add_donation(donation)
+
+			return donor_projected
+
+
+		else:
+
+			donor_post_challenge = Donor(self.name)
+
+			self.donations = list(filter(lambda x: x >= min_donations and x <= max_donations, self.donations))
+
+			inflated_donations = list(map(lambda x: x*inflation_factor, self.donations))
+
+			for donation in inflated_donations:
+				donor_post_challenge.add_donation(donation)
+
+			return donor_post_challenge			
 
 
 
@@ -53,7 +75,9 @@ class DonorList():
 		print("1 - Send a thank you ")
 		print("2 - Create a report ")
 		print("3 - Send letters to everyone ")
-		print("4 - Quit")
+		print("4 - Projections if all donations under $100 are doubled ")
+		print("5 - Projections if all donations above $50 are tripled ")
+		print("6 - Quit")
 
 		while True:
 			try:
@@ -118,7 +142,19 @@ class DonorList():
 			donor_list_post_challenge.add_donor(current_donor.challenge(inflation_factor = inflation_factor, *args, **kwargs))
 		return donor_list_post_challenge
 
+	def double_contributions_under_100(self):
+		projected_donor_list = self.challenge_donors(inflation_factor = 2, max_donations = 100, projection = True)
+		projected_dict = {}
+		for donor in projected_donor_list.donors.values():
+			projected_dict.setdefault(donor.name, []).append(donor.total_donations)
+		print(projected_dict)
 
+	def triple_contributions_over_50(self):
+		projected_donor_list = self.challenge_donors(inflation_factor = 3, min_donations = 50, projection = True)
+		projected_dict = {}
+		for donor in projected_donor_list.donors.values():
+			projected_dict.setdefault(donor.name, []).append(donor.total_donations)
+		print(projected_dict)		
 
 if __name__ == '__main__':
 	# Create a switch dictionary
@@ -144,13 +180,15 @@ if __name__ == '__main__':
 	1: donor_list.send_a_thank_you,
 	2: donor_list.create_a_report,
 	3: donor_list.send_letters_to_everyone,
- 	4: sys.exit
+	4: donor_list.double_contributions_under_100,
+	5: donor_list.triple_contributions_over_50,
+ 	6: sys.exit
 	}
 	while True:
 		try:
 			switch_response_dictionary.get(donor_list.prompt_user())()
 		except TypeError:
-			print("You must enter a positive integer from one of 1, 2, 3, or 4.")
+			print("You must enter a positive integer from one of 1, 2, 3, 4, 5, or 6.")
 			continue
 
 
