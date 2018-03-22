@@ -4,46 +4,36 @@ import os
 
 
 class MailRoomUnittest(unittest.TestCase):
+    def setUp(self):
+        self.donate_unit_list = [['William Gates', 500, 500.5], ['Mark Zuckerberg', 300, 300.6, 500, 600], ['Jeff Bezos', 800, 970.44], ['Paul Allen', 1, 1000, 780.5]]
+        self.file_names = ["William_Gates.txt", "Mark_Zuckerberg.txt", "Jeff_Bezos.txt", "Paul_Allen.txt"]
 
-    def test_print_donor_list(self):
-        self.donate_list = mailroom.donor_names()
-        try:
-            if self.donate_list is not None:
-                print(self.donate_list)
-        except ValueError:
-            print("Not Donor Names")
+    def test_check_donor_list(self):
+        total_donors = len(self.donate_unit_list)
+        i = 0
+        while i < total_donors:
+            assert(self.donate_unit_list[i][0] in mailroom.donor_names())
+            print(self.donate_unit_list[i][0])
+            i = i+1
 
     def test_create_report_files(self):
-        text = mailroom.create_report()
-        try:
-            if text is not None:
-                print(text)
-        except ValueError:
-            print("Not Donor Names")
-
         mailroom.create_report_files()
-        file = mailroom.send_file_name
-        try:
-            print(file, os.path.exists(file))
-        except FileNotFoundError:
-            print("The file {} is not found".format(file))
+        for file in self.file_names:
+            if os.path.exists(file):
+                print("File name is created and exists: {}".format(file))
+                with open(file, 'r') as f:
+                    line = f.readline()
+                    #print(line)
+                    assert("Dear " in line)
 
-    def test_thank_note(self):
-        self.donate_list = mailroom.donor_names()
-        text_1 = mailroom.thank_note("all donors")
-        try:
-            if "Thank" in text_1:
-                print(text_1)
-        except ValueError:
-            print("No Thank you Note found")
-
-        text_2 =mailroom.thank_note(self.donate_list[0], "single")
-        try:
-            if "Thank" in text_2:
-                print(text_2)
-        except ValueError:
-            print("No Thank you Note found")
-
+    def test_thank_you_note(self):
+        donor_complete_list = mailroom.donor_names()
+        for one_donor in donor_complete_list:
+            note = mailroom.thank_note(one_donor)
+            assert("Thank you very much for your recent donation!" in note)
+        note1 = mailroom.thank_note(donor_complete_list)
+        for one_donor in donor_complete_list:
+            assert(one_donor in note1)
 
 if __name__ == '__main__':
     unittest.main()
