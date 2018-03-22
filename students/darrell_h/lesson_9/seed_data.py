@@ -1,0 +1,12 @@
+initial_data = {'jack': {'donations': [100, 200, 300, 400],
+                        'lname': 'ripper'},
+               'mary':{'donations': [3000,5000],
+                       'lname': 'jones'},
+               'frank':{'donations': [29.50, 31],
+                        'lname': 'lampard'},
+               'jane':{'donations':[3000,5000],
+                       'lname': 'doe'},
+               'ebenezer': {'donations': [1,2,3],
+                             'lname': 'scrooge'},
+               'bob':{'donations':[60000, 70000, 7668, 4],
+                      'lname': 'newhart'}}
