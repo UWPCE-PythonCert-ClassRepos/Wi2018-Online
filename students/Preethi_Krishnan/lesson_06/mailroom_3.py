@@ -38,6 +38,7 @@ def thank_note(donor_name, choice="single"):
     if choice in "single":
         thank_note = "Dear  {}, \n Thank you very much for your recent donation! \n {} Thank You, \n {} Charity A".format(donor_name, space, space)
         print(thank_note)
+        return thank_note
     elif choice in "all donors":
         for sub_list in donate_list:
             if sub_list[0] == donor_name:
@@ -54,14 +55,16 @@ def create_report():
         no_of_gifts = len(each_donation[1:])
         average = total / no_of_gifts
         print("{:20s}    $  {:13.5f} {:10d}    $  {:13.5f}".format(each_donation[0], total, no_of_gifts, average))
+        report_note = "{:20s}    $  {:13.5f} {:10d}    $  {:13.5f}".format(each_donation[0], total, no_of_gifts, average)
+        return report_note
 
 def create_report_files():
+    global send_file_name
     for name in donor_names():
         send_file = name.split()
         send_file_name = send_file[0] + "_" + send_file[1] + ".txt"
-        f = open(send_file_name, 'w')
-        f.writelines(thank_note(name, "all donors"))
-        f.close()
+        with open(send_file_name, 'w') as f:
+            f.writelines(thank_note(name, "all donors"))
 
 def main_menu():
     print("Enter 0 at any point to return to Main Menu")
