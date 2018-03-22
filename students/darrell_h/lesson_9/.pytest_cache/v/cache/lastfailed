@@ -1,0 +1,4 @@
+{
+  "test_donors.py::test_add_donation": true,
+  "test_donors.py::test_create_donor_with_donations": true
+}
