@@ -4,32 +4,39 @@ import datetime
 """Contribution Mail Room"""
 """Data structure that holds a list of your donors and a history of the amounts they have donated"""
 
-contributor_list = [('Ken','Murray','10.00', '4.00'),('Tew','Tangsuk','2.68','78268','265.68'),('Joe','joe','5.50','57.89'),('Tina','Tangsuk','29.02'),('Nathan','Merrill','20.00')]
+contributor_list = [('Ken', 'Murray', '10.00', '4.00'),
+                    ('Tew', 'Tangsuk', '2.68', '78268', '265.68'),
+                    ('Joe', 'joe', '5.50', '57.89'),
+                    ('Tina', 'Tangsuk', '29.02'),
+                    ('Nathan', 'Merrill', '20.00')
+                    ]
 
 
 def donor_list():
     """Returns a list of donors sorted by first name"""
     names_of_donors = []
     for name in contributor_list:
-        names_of_donors.append(name[0]+" "+name[1])
+        names_of_donors.append(name[0] + " " + name[1])
     return names_of_donors
+
 
 def add_donor(name):
     """Adds a first and last name to the list"""
     contributor_list.append(tuple(name.split(" ")))
     return contributor_list
 
+
 def is_donor(check_name):
     """Return true or false"""
     names_of_donors = []
     for name in contributor_list:
-        names_of_donors.append(name[0]+" "+name[1])
+        names_of_donors.append(name[0] + " " + name[1])
     for fullname in names_of_donors:
         if fullname.casefold() == check_name.casefold():
             return "true"
 
 
-def new_donation(donation,donor_name):
+def new_donation(donation, donor_name):
     """Adds a new donation to the contribution list"""
     fullname = tuple(donor_name.split(" "))
     firstname = fullname[0]
@@ -42,7 +49,7 @@ def new_donation(donation,donor_name):
         counter = counter + 1
 
 
-def thankyou_email(donation,donor_name):
+def thankyou_email(donation, donor_name):
     print(f"Dear {donor_name}:")
     print()
     print()
@@ -67,7 +74,8 @@ def print_report():
         if report_num_gifts > 1:
             given_counter = 3
             while given_counter < len(donor_report):
-                report_total_given = float("{:.2f}".format(float(report_total_given))) + float("{:.2f}".format(float(donor_report[given_counter])))
+                report_total_given = float("{:.2f}".format(float(report_total_given))) + float(
+                    "{:.2f}".format(float(donor_report[given_counter])))
                 given_counter = given_counter + 1
         report_average = float(report_total_given) / int(report_num_gifts)
         report_average = "{:.2f}".format(report_average)
@@ -78,12 +86,49 @@ def print_report():
     print()
 
 
+def mailroom_menu(prompt, dispatch_dict):
+    while True:  # loop until quit
+        response = input(prompt)
+        if dispatch_dict[response]() == "exit menu":
+            break
 
+
+def send_letter():
+    print('letter')
+
+
+def create_report():
+    print('report')
+
+
+def send_letters_all():
+    print('All letters')
+
+
+def quit():
+    print("You are now leaving the Mail Room")
+    return "exit menu"
+
+
+main_prompt = ("\nWelcome to the Mail Room.\n"
+               "Please select and action from the menu.\n"
+               "1 - Send a Thank You\n"
+               "2 - Create a Report\n"
+               "3 - Send Letters to everyone\n"
+               "q - Quit\n"
+               )
+main_dispatch = {'1': send_letter,
+                 '2': create_report,
+                 '3': send_letters_all,
+                 'q': quit
+                 }
 
 if __name__ == '__main__':
-    begin = 0
-    while begin == 0:
-        '''Send a Thank You”, “Create a Report” or “quit'''
+    mailroom_menu(main_prompt, main_dispatch)
+
+    '''Send a Thank You”, “Create a Report” or “quit'''
+
+'''
         response = input("Hello, please select what you would like to do: (1)Thank a donor (2)Create a report. Type exit at any time to end the program. > ")  #user will pick the activity
         if response.lower() == "exit":
             exit()
@@ -101,9 +146,8 @@ if __name__ == '__main__':
             donor_new_list = new_donation(donation_amount,response_donor_name)
             print(f'I have recorded a donation in the amount of ${donation_amount}')
             thankyou_email(donation_amount,response_donor_name)  # compose an email thanking the donor for their generous donation. Print the email to the terminal and return to the original prompt.
-            begin = 1
+            continue
         if int(response) == int(2):  #Create a Report
             print_report()
-            begin = 1
-
-
+            continue
+'''
