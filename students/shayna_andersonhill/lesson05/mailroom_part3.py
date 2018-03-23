@@ -15,31 +15,34 @@ donations = {'Shayna Hill': [['01/01/2017', 50], ['02/01/2017', 50],
 
 name_list = [name for name in donations]
 
-total_donation = {}
-for key, value in donations.items():
-    total_sum = 0
-    for donation in value:
-        total_sum += donation[1]
-    total_donation.update({key: total_sum})
+def donation_numbers():
+    total_donation = {}
+    for key, value in donations.items():
+        total_sum = 0
+        for donation in value:
+            total_sum += donation[1]
+        total_donation.update({key: total_sum})
 
-count_donation = {}
-for key, value in donations.items():
-    count = 0
-    for donation in value:
-        count += 1 
-    count_donation.update({key: count})
+    count_donation = {}
+    for key, value in donations.items():
+        count = 0
+        for donation in value:
+            count += 1 
+        count_donation.update({key: count})
 
-average_donation = {}
-for key, value in donations.items():
-    total_sum = 0
-    count = 0
-    for donation in value:
-        total_sum += donation[1]
-        count += 1
-    average = total_sum/count
-    average_donation.update({key: average})
+    average_donation = {}
+    for key, value in donations.items():
+        total_sum = 0
+        count = 0
+        for donation in value:
+            total_sum += donation[1]
+            count += 1
+        average = total_sum/count
+        average_donation.update({key: average})
+    return total_donation, count_donation, average_donation
 
 def report():
+    total_donation, count_donation, average_donation = donation_numbers()
     heading = ['Donor Name', '| Total Given', '| Num Gifts', '| Average Gift']
     print('{:20}{:>15}{:>15}{:>15}'.format(*heading))
     print('------------------------------------------------------------------')
