@@ -51,14 +51,14 @@ def new_donation(donation, donor_name):
 
 def thankyou_email(donation, donor_name):
     print(f"Dear {donor_name}:")
-    print()
-    print()
-    print(f"Thank you for your donation of ${donation}. Your gift is greatly appreciated.")
-    print(f"Your generosity and thoughtfulness means so much to all of us.")
-    print()
-    print()
-    print("Sincerely,")
-    print("Kenneth Murray")
+    print('\n'
+          '\n'
+          f'Thank you for your donation of ${donation}. Your gift is greatly appreciated.\n'
+          f'\nYour generosity and thoughtfulness means so much to all of us.\n'
+            '\n'
+            'Sincerely,\n'
+            'Kenneth Murray\n'
+           )
 
 
 def print_report():
@@ -84,6 +84,7 @@ def print_report():
         index = index + 1
     print()
     print()
+    return True
 
 
 def mailroom_menu(prompt, dispatch_dict):
@@ -91,14 +92,26 @@ def mailroom_menu(prompt, dispatch_dict):
         response = input(prompt)
         if dispatch_dict[response]() == "exit menu":
             break
-
+    return True
 
 def send_letter():
-    print('letter')
+    name_list = input('To see a list of names please type \"list\" or press enter to continue.  > ')  # If the user types ‘list’, show them a list of the donor names and re-prompt
+    if name_list.lower() == "list":
+        names_of_donors=donor_list()
+        names_of_donors.sort()
+        print(names_of_donors)
+    response_donor_name = input('Please enter the FIRST and LAST name of a new or existing donor  > ')
+    if not is_donor(response_donor_name) == "true":  # If the user types a name not in the list, add that name to the data structure and use it.
+        add_donor(response_donor_name)
+    response_new_donation = input(f'what is the amount that {response_donor_name} would like to donate?  > ')  # Once a name has been selected, prompt for a donation amount.
+    new_donation(response_new_donation,response_donor_name)
+    donation_amount = '{:,.2f}'.format(float(response_new_donation))  # Turn the amount into a number
+    print(f'I have recorded a donation in the amount of ${donation_amount}')
+    thankyou_email(donation_amount,response_donor_name)  # compose an email thanking the donor for their generous donation. Print the email to the terminal and return to the original prompt.
 
 
 def create_report():
-    print('report')
+    print_report()
 
 
 def send_letters_all():
@@ -124,30 +137,6 @@ main_dispatch = {'1': send_letter,
                  }
 
 if __name__ == '__main__':
+    '''Send a Thank You”, “Create a Report” or “quit '''
+
     mailroom_menu(main_prompt, main_dispatch)
-
-    '''Send a Thank You”, “Create a Report” or “quit'''
-
-'''
-        response = input("Hello, please select what you would like to do: (1)Thank a donor (2)Create a report. Type exit at any time to end the program. > ")  #user will pick the activity
-        if response.lower() == "exit":
-            exit()
-        if int(response) == int(1):
-            name_list = input('To see a list of names please type \"list\" or press enter to continue.  > ')  # If the user types ‘list’, show them a list of the donor names and re-prompt
-            if name_list.lower() == "list":
-                names_of_donors=donor_list()
-                names_of_donors.sort()
-                print(names_of_donors)
-            response_donor_name = input('Please enter the FIRST and LAST name of a new or existing donor  > ')
-            if not is_donor(response_donor_name) == "true":  # If the user types a name not in the list, add that name to the data structure and use it.
-                add_donor(response_donor_name)
-            response_new_donation = input(f'what is the amount that {response_donor_name} would like to donate?  > ')  # Once a name has been selected, prompt for a donation amount.
-            donation_amount = '{:,.2f}'.format(float(response_new_donation))  # Turn the amount into a number
-            donor_new_list = new_donation(donation_amount,response_donor_name)
-            print(f'I have recorded a donation in the amount of ${donation_amount}')
-            thankyou_email(donation_amount,response_donor_name)  # compose an email thanking the donor for their generous donation. Print the email to the terminal and return to the original prompt.
-            continue
-        if int(response) == int(2):  #Create a Report
-            print_report()
-            continue
-'''
