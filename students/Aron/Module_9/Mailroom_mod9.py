@@ -1,46 +1,11 @@
 #!/usr/local/python3
-
+import donordata as Donordata
 import sys
-import weakref
 
 #Initial Donors List
-#
+#donors = {'Aron': [10000,300, 100], 'Joan':[100, 50, 65], 'Jean':[30,150], 'Scott':[200]}
 
-_donor_list = []
-
-#Donor Class
-class donor:
-    donor_list = []
-    def __init__(self, name, donations):
-        self.donor_name = name
-        self.donations = donations
-        self._donor_list.add(weakref.ref(self))
-        #return self.donor_name, self.donations
-    @classmethod
-    def __getinstances(cls):
-
-   # def giving(self, donations):
-    #   self.donations = donations
-    #    return self.donations
-
-    def __iter__(self):
-        return self
-
-    def donor_info(self):
-        return 'Donor: {}'.format(self.donor_name)
-
-    def donor_names(self):
-        for donor in self.donor_name:
-            names.append(donor)
-
-    def __add__(self, object):
-        return donor(self.donations + object.donations)
-
-
-
-#Donor Collection (add, search for donor)
-
-#Donor reporting
+donors = {'Aron': [100, 300, 100], 'Joan': [100, 50, 65, 100], 'Jean': [30, 150], 'Scott': [200]}
 
 
 #Thank You Functionality
@@ -50,7 +15,7 @@ class donor:
 ##Once a name has been selected, prompt for a donation amount.
 ##Turn the amount into a number – it is OK at this point for the program to crash if someone types a bogus amount.
 ##Once an amount has been given, add that amount to the donation history of the selected user.
-##Compost an email thanking the donor for their generous donation. Print the email to the terminal and return to the original prompt.
+##Compose an email thanking the donor for their generous donation. Print the email to the terminal and return to the original prompt.
 
 #creation of seperator
 def seperator(str):
@@ -58,32 +23,37 @@ def seperator(str):
     return "-" * (len(str) - str.count('\n'))
 
 #Summary of donor giving
-summary=[]
-def donor_sum():
+#summary=[]
+#def donor_sum():
     #summary=[]
     #donor_summary={}
-    for donor in donors:
-        summary.append(sum(donors[donor]))
+    #for donor in donors:
+        #summary.append(sum(donors[donor]))
     #    donor_summary.append([donor](summary))
-    return summary
+    #return summary
     #return donor_summary
 
 #list of donor names
-names=[]
-def donor_names():
-    for donor in donors:
-        names.append(donor)
+#names=[]
+#def donor_names():
+#    for donor in donors:
+#        names.append(donor)
 
-def list_check(x):
+names = Donordata.Donor.donor_names()
+nameadd = Donordata.Donor.add_donor()
+
+def list_check():
+    global y
     while True:
         x=input("Check user name: ")
-        if x in names:
+        if x in Donordata.Donor.names:
             print("We have a match")
         else:
             y = input("No match, adding to list. Please enter donation amount ")
-        donors.append([x,[y]])
+        #call Add Donor method
+        nameadd('x',y)
 
-donor_list = donor_names() # create a list of names only
+#donor_list = donor_names() # create a list of names only
 
 def send_thank_you():
     while True:
@@ -103,41 +73,54 @@ def send_thank_you():
             continue
     init()
 
-donor_data = []
-donor_data = donor_sum()
+#Zip or donor names and summary dontations to one file
+#donor_data = []
+#donor_data = donor_sum()
+#donor_result = dict(zip(names, donor_data))
+
 def create_report():
-    heading = "Donor Name | Num Gifts | Average Gift\n"
+    heading = "Donor Name | Total Gifts | Num Gifts | Average\n"
     print(heading + seperator(heading))
-    for k, v in donors.items():
-        print("{:10}{:10}{:10}".format(k, len(v), (sum(v)/len(v))))
+    for k, v in Donordata.Donor.donors.items():
+        print("{:10} ${:10.2f}{:10}${:15.2f}".format(k, sum(v), len(v), (sum(v)/len(v))))
     init()
 
 #donor_summary=dict(zip(names, summary))
 
 def create_email():
-    for k, v in donors.items():
+    for k, v in donor_result.items():
         email_text=open(k+"final.txt", 'w')
         email_text.write('Dear '+k+',\n\nYour gift of $'+str(v)+' is greatly appreciated.\n\nSincerely,\nAron')
         email_text.close()
+
+
+def exit():
+    print('\n**exiting**')
+    sys.exit()
     init()
 
 def init():
     while True:
         heading = "Main Menu"
         print(heading)
-        choice = input("1 - See list of donors\n" "2 - Create a Report\n" "3 - Create email to file\n" "4 - Quit\n")
+        choice = input("1 - Check list for name\n" "2 - See list of donors\n" "3 - Create a Report\n" "4 - Create email to file\n" "5 - Quit\n")
         if choice == '1':
+            list_check()
+            break
+        if choice == '2':
             send_thank_you()
             break
-        elif choice == '2':
+        elif choice == '3':
             create_report()
             break
-        elif choice =='3':
+        elif choice =='4':
             create_email()
             break
-        elif choice == '4':
-            print ('Exit')
-            sys.exit()
+        elif choice == '5':
+            exit()
+        else:
+            print("Bad selection, try again")
+
 
 if __name__ == "__main__":
     init()
