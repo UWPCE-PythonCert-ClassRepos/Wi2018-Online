@@ -5,6 +5,8 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Module_9" />
+    <orderEntry type="module" module-name="Module_6" />
+    <orderEntry type="module" module-name="Module5" />
   </component>
   <component name="TestRunnerService">
     <option name="projectConfiguration" value="py.test" />

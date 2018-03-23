@@ -85,11 +85,11 @@ def create_email():
         email_text=open(k+"final.txt", 'w')
         email_text.write('Dear '+k+',\n\nYour gift of $'+str(v)+' is greatly appreciated.\n\nSincerely,\nAron')
         email_text.close()
-    init()
+
 
 def exit():
-    sys.exit()
     print('\n**exiting**')
+    sys.exit()
     init()
 
 def init():
@@ -111,8 +111,8 @@ def init():
             break
         elif choice == '5':
             exit()
-            break
-
+        else:
+            print("Bad selection, try again")
 
 
 if __name__ == "__main__":
