@@ -30,21 +30,22 @@ def email_thx():
             print("[OUT]: ", list(dict_data.keys()))
         if options == "2":
             email_name = input("\n[IN]: Enter donor name: ")
-            try:
-                # check if the input name already exists
-                dict_data[email_name]
-            except KeyError:
-                # name is not in dict, add it and ask for donation
-                print("\n[OUT]: Donor name is not on record. Adding new Donor name")
-                email_money = input("[IN]: Enter new donor's donation amount = ")
-                dict_data.update({email_name: [float(email_money),1]})
-            finally:
-                print("[OUT]: Thank you {}, for donating ${}. - PydPiper".format( \
-                email_name, dict_data[email_name][0]))
+            email_thx_op2(email_name)
         if options == "3": break
 
 
-
+def email_thx_op2(email_name):
+    try:
+        # check if the input name already exists
+        dict_data[email_name]
+    except KeyError:
+        # name is not in dict, add it and ask for donation
+        print("\n[OUT]: Donor name is not on record. Adding new Donor name")
+        email_money = input("[IN]: Enter new donor's donation amount = ")
+        dict_data.update({email_name: [float(email_money),1]})
+    finally:
+        print("[OUT]: Thank you {}, for donating ${}. - PydPiper".format( \
+        email_name, dict_data[email_name][0]))
 
 # ======== Create a Report ========
 def report():
