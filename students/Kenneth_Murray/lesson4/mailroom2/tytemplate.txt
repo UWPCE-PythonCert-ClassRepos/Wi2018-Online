@@ -1,0 +1,9 @@
+Dear {firstname} {lastname}:
+
+
+Thank you for your donation of $10.00. Your gift is greatly appreciated.
+
+Your generosity and thoughtfulness means so much to all of us.
+
+Sincerely,
+Kenneth Murray

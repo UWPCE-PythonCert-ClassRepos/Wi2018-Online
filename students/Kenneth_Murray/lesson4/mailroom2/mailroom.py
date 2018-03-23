@@ -50,15 +50,25 @@ def new_donation(donation, donor_name):
 
 
 def thankyou_email(donation, donor_name):
-    print(f"Dear {donor_name}:")
-    print('\n'
-          '\n'
-          f'Thank you for your donation of ${donation}. Your gift is greatly appreciated.\n'
-          f'\nYour generosity and thoughtfulness means so much to all of us.\n'
-            '\n'
-            'Sincerely,\n'
-            'Kenneth Murray\n'
-           )
+    import datetime
+    datestr = str(datetime.datetime.now()) # timestamp for txt files
+    dt = datestr[0:4] + datestr[-6:]
+    # \n is placed to indicate EOL (End of Line)
+    mail_file = f'{donor_name}{dt}.txt'
+    thank_you = open(mail_file, 'w+')
+    L = [f'Dear {donor_name}: \n',
+         '\n',
+         '\n',
+         f'Thank you for your donation of ${donation}.\n',
+         'Your gift is greatly appreciated.\n',
+         '\n',
+         'Sincerely,\n',
+         'Kenneth Murray\n'
+         ]
+    thank_you.writelines(L)
+    thank_you.close()  # to change file access modes
+    print(mail_file)
+    return mail_file
 
 
 def print_report():
@@ -94,20 +104,25 @@ def mailroom_menu(prompt, dispatch_dict):
             break
     return True
 
+
 def send_letter():
-    name_list = input('To see a list of names please type \"list\" or press enter to continue.  > ')  # If the user types ‘list’, show them a list of the donor names and re-prompt
+    name_list = input(
+        'To see a list of names please type \"list\" or press enter to continue.  > ')  # If the user types ‘list’, show them a list of the donor names and re-prompt
     if name_list.lower() == "list":
-        names_of_donors=donor_list()
+        names_of_donors = donor_list()
         names_of_donors.sort()
         print(names_of_donors)
     response_donor_name = input('Please enter the FIRST and LAST name of a new or existing donor  > ')
-    if not is_donor(response_donor_name) == "true":  # If the user types a name not in the list, add that name to the data structure and use it.
+    if not is_donor(
+            response_donor_name) == "true":  # If the user types a name not in the list, add that name to the data structure and use it.
         add_donor(response_donor_name)
-    response_new_donation = input(f'what is the amount that {response_donor_name} would like to donate?  > ')  # Once a name has been selected, prompt for a donation amount.
-    new_donation(response_new_donation,response_donor_name)
+    response_new_donation = input(
+        f'what is the amount that {response_donor_name} would like to donate?  > ')  # Once a name has been selected, prompt for a donation amount.
+    new_donation(response_new_donation, response_donor_name)
     donation_amount = '{:,.2f}'.format(float(response_new_donation))  # Turn the amount into a number
     print(f'I have recorded a donation in the amount of ${donation_amount}')
-    thankyou_email(donation_amount,response_donor_name)  # compose an email thanking the donor for their generous donation. Print the email to the terminal and return to the original prompt.
+    thankyou_email(donation_amount,
+                   response_donor_name)  # compose an email thanking the donor for their generous donation. Print the email to the terminal and return to the original prompt.
 
 
 def create_report():
@@ -115,7 +130,12 @@ def create_report():
 
 
 def send_letters_all():
-    print('All letters')
+    """creates messages for  the last donation of all donors"""
+    for name_donation in contributor_list:
+        name = name_donation[0] + ' ' + name_donation[1]
+        donation = name_donation[-1]
+        thankyou_email(donation,name)
+    return True
 
 
 def quit():
