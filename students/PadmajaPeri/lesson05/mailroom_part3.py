@@ -54,7 +54,15 @@ def print_thank_you(name, write_to_file=0):
                 format(name, sum(donation_dict[name]))
     if not write_to_file:
         print(notes_text)
+    else:
+        write_text_to_file(name, notes_text)
     return notes_text
+
+
+def write_text_to_file(name, text):
+    file_name = "_".join(name.split()) + '.txt'
+    with open(file_name, 'w') as fd:
+        fd.write(text)
 
 
 def send_thank_you_to_all_donors():
