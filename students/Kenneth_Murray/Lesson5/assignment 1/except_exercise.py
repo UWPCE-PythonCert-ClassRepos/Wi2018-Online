@@ -30,6 +30,8 @@ except SyntaxError:
 else:
     print(not_joke)
 
+
+#
 # What did that do? You can think of else in this context, as well as in
 # loops as meaning: "else if nothing went wrong"
 # (no breaks in  loops, no exceptions in try blocks)
@@ -47,4 +49,11 @@ else:
 # parameters. (pun intended)
 
 langs = ['java', 'c', 'python']
+
+try:
+    next_joke = more_fun(langs[2])
+except SyntaxError:
+    print('there is a syntax error')
+finally:
+    last_fun()
 
