@@ -7,7 +7,9 @@ Study in Scarlet, I was seized with a keen desire to see Holmes
 again, and to know how he was employing his extraordinary powers.
 His rooms were brilliantly lit, and, even as I looked up, I saw
 his tall, spare figure pass twice in a dark silhouette against
-the blind. He was pacing the room swiftly, eagerly, with his head
+the blind. 
+
+He was pacing the room swiftly, eagerly, with his head
 sunk upon his chest and his hands clasped behind him. To me, who
 knew his every mood and habit, his attitude and manner told their
 own story. He was at work again. He had risen out of his
