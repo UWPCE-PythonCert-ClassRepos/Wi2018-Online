@@ -51,7 +51,7 @@ def new_donation(donation, donor_name):
 
 def thankyou_email(donation, donor_name):
     import datetime
-    datestr = str(datetime.datetime.now()) # timestamp for txt files
+    datestr = str(datetime.datetime.now())  # timestamp for txt files
     dt = datestr[0:4] + datestr[-6:]
     # \n is placed to indicate EOL (End of Line)
     mail_file = f'{donor_name}{dt}.txt'
@@ -100,7 +100,14 @@ def print_report():
 def mailroom_menu(prompt, dispatch_dict):
     while True:  # loop until quit
         response = input(prompt)
-        if dispatch_dict[response]() == "exit menu":
+        try:
+            if dispatch_dict[response]() == "exit menu":
+                break
+        except KeyError:
+            print("That was an invalid choice.\n"
+                  'Please make a selection from the menu\n'
+                  'You are now leaving the Mail Room\n'
+                  )
             break
     return True
 
@@ -134,7 +141,7 @@ def send_letters_all():
     for name_donation in contributor_list:
         name = name_donation[0] + ' ' + name_donation[1]
         donation = name_donation[-1]
-        thankyou_email(donation,name)
+        thankyou_email(donation, name)
     return True
 
 
