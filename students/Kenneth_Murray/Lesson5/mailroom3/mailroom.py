@@ -14,9 +14,6 @@ contributor_list = [('Ken', 'Murray', '10.00', '4.00'),
 
 def donor_list():
     """Returns a list of donors sorted by first name"""
-#    names_of_donors = []
-#    for name in contributor_list:
-#        names_of_donors.append(name[0] + " " + name[1])
     names_of_donors = [(name[0] + ' ' + name[1]) for name in contributor_list]
     return names_of_donors
 
