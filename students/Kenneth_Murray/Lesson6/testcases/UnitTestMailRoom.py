@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-import datetime
+"""
+Unit tests for the mailroom program
 
-"""Contribution Mail Room"""
-"""Data structure that holds a list of your donors and a history of the amounts they have donated"""
+"""
+
 
 contributor_list = [('Ken', 'Murray', '10.00', '4.00'),
                     ('Tew', 'Tangsuk', '2.68', '78268', '265.68'),
@@ -12,6 +13,14 @@ contributor_list = [('Ken', 'Murray', '10.00', '4.00'),
                     ]
 
 
+def test_donor_list():
+    from mailroom import donor_list
+    import unittest
+    print("donor_test")
+    return True
+
+
+''' 
 def donor_list():
     """Returns a list of donors sorted by first name"""
     names_of_donors = [(name[0] + ' ' + name[1]) for name in contributor_list]
@@ -22,7 +31,22 @@ def add_donor(name):
     """Adds a first and last name to the list"""
     contributor_list.append(tuple(name.split(" ")))
     return contributor_list
+'''
 
+def test_add_donor():
+    from mailroom import add_donor
+    import unittest
+    print('add_donor')
+    return True
+
+def test_is_donor():
+    from mailroom import is_donor
+    import unittest
+    print('is doner')
+    return True
+
+
+'''
 
 def is_donor(check_name):
     """Return true or false"""
@@ -46,7 +70,23 @@ def new_donation(donation, donor_name):
             contributor_list[index] = contributor_list[index] + (str(donation),)
         counter = counter + 1
 
+'''
 
+def test_new_donation():
+    from mailroom import new_donation
+    import unittest
+    print('new donation')
+    return True
+
+
+def test_thankyou_email():
+    from mailroom import thankyou_email
+    import unittest
+    print('thankyou email')
+    return True
+
+
+'''
 def thankyou_email(donation, donor_name):
     import datetime
     datestr = str(datetime.datetime.now())  # timestamp for txt files
@@ -93,7 +133,23 @@ def print_report():
     print()
     print()
     return True
+'''
 
+def test_print_report():
+    from mailroom import print_report
+    import unittest
+    print('report')
+    return True
+
+
+def test_mailroom_menu():
+    from mailroom import mailroom_menu
+    import unittest
+    print('menu')
+    return True
+
+
+'''
 
 def mailroom_menu(prompt, dispatch_dict):
     while True:  # loop until quit
@@ -108,7 +164,17 @@ def mailroom_menu(prompt, dispatch_dict):
                   )
             break
     return True
+'''
 
+
+def test_send_letter():
+    from mailroom import send_letter
+    import unittest
+    print('send letter')
+    return True
+
+
+'''
 
 def send_letter():
     name_list = input(
@@ -133,6 +199,22 @@ def send_letter():
 def create_report():
     print_report()
 
+'''
+
+def test_create_report():
+    from mailroom import create_report
+    import unittest
+    print('create report')
+    return True
+
+
+def test_send_letters_all():
+    from mailroom import send_letters_all
+    import unittest
+    print('send letters all')
+    return True
+
+'''
 
 def send_letters_all():
     """creates messages for  the last donation of all donors"""
@@ -142,26 +224,62 @@ def send_letters_all():
         thankyou_email(donation, name)
     return True
 
+'''
+
+
+def single_test_menu():
+    print('single test')
+    return True
+
+
+def test_all_the_things():
+    print('test all the things')
+    return True
+
+
+def test_quit():
+    from mailroom import quit
+    import unittest
+    print('quit')
+    return True
+
+
+def unittest_menu(prompt, dispatch_dict):
+    while True:  # loop until quit
+        response = input(prompt)
+        try:
+            if dispatch_dict[response]() == "exit menu":
+                break
+        except KeyError:
+            print("That was an invalid choice.\n"
+                  'Please make a selection from the menu\n'
+                  'You are now leaving the Mail Room unit test\n'
+                  )
+            break
+    return True
+
 
 def quit():
-    print("You are now leaving the Mail Room")
+    print("You are now leaving the Mail Room Unit Test")
     return "exit menu"
 
 
-main_prompt = ("\nWelcome to the Mail Room.\n"
+main_prompt = ("\nWelcome to the Mail Room Unit Test.\n"
                "Please select and action from the menu.\n"
-               "1 - Send a Thank You\n"
-               "2 - Create a Report\n"
-               "3 - Send Letters to everyone\n"
+               "1 - choose an individual test\n"
+               "2 - Run all of the tests\n"
                "q - Quit\n"
                )
-main_dispatch = {'1': send_letter,
-                 '2': create_report,
-                 '3': send_letters_all,
+main_dispatch = {'1': single_test_menu,
+                 '2': test_all_the_things,
                  'q': quit
                  }
 
 if __name__ == '__main__':
-    '''Send a Thank You”, “Create a Report” or “quit '''
+    '''
+    This is a test suite for the mailroom program.
+    you will be able to run individual tests or run all of the tests from this menu.
+    the default will be to run all of the tests.
+    '''
 
-    mailroom_menu(main_prompt, main_dispatch)
+    unittest_menu(main_prompt, main_dispatch)
