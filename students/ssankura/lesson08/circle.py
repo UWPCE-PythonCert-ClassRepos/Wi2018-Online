@@ -109,6 +109,10 @@ if __name__ == "__main__":
 
 	print ("****** STEP6 ******")
 	d = eval(repr(c0))
+
+	print (f"repr output = {repr(c0)}")
+	print (f"eval repr output = {eval(repr(c0))}")
+
 	print (f"Circle d after eval of repr on c0 = {d}")
 
 	c2 = Circle(2)
