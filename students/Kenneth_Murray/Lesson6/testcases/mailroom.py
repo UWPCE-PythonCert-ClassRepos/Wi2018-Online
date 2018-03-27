@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-import datetime
 
 """Contribution Mail Room"""
 """Data structure that holds a list of your donors and a history of the amounts they have donated"""
 
 contributor_list = [('Ken', 'Murray', '10.00', '4.00'),
-                    ('Tew', 'Tangsuk', '2.68', '78268', '265.68'),
+                    ('Tew', 'Tangsuk', '2.68', '78.22', '26.68'),
                     ('Joe', 'joe', '5.50', '57.89'),
                     ('Tina', 'Tangsuk', '29.02'),
                     ('Nathan', 'Merrill', '20.00')
@@ -31,7 +30,9 @@ def is_donor(check_name):
         names_of_donors.append(name[0] + " " + name[1])
     for fullname in names_of_donors:
         if fullname.casefold() == check_name.casefold():
-            return "true"
+            return True
+        else:
+            return False
 
 
 def new_donation(donation, donor_name):
@@ -45,7 +46,7 @@ def new_donation(donation, donor_name):
             index = counter
             contributor_list[index] = contributor_list[index] + (str(donation),)
         counter = counter + 1
-
+    return True
 
 def thankyou_email(donation, donor_name):
     import datetime
@@ -132,6 +133,7 @@ def send_letter():
 
 def create_report():
     print_report()
+    return True
 
 
 def send_letters_all():
