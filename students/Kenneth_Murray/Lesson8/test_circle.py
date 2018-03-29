@@ -27,4 +27,18 @@ def test_def_circle_properties(radius = 5):
     return True
 
 
+def test_def_circle_change_diameter(radius = 5):
+    '''
+    Validate that the radius or diameter can be changed after the circle has been defined and will affect a change on each other.
+    This will test the properties.
+    '''
+    from circle import MyCircle
+    test_circle_diameter = MyCircle(5)
+    assert test_circle_diameter.radius == 5
+    assert test_circle_diameter.diameter == 10
+    assert test_circle_diameter.area == 78.53981633974483
+    test_circle_diameter.diameter = 14
+    assert test_circle_diameter.radius == 7
+    assert test_circle_diameter.diameter == 14
+
 
