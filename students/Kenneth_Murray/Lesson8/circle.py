@@ -1,34 +1,19 @@
 #!/usr/bin/env python3
 '''The Circle Class
 inputs :
-    Diameter
-    Radius
-    print
-output:
+    the_radius
+properties :
     diameter
     radius
     area
-    compare
 '''
 
 class MyCircle():
 
-     def __init__(self, the_radius):
-        '''This is the radius of the circle'''
+    def __init__(self, the_radius):
+        from math import pi
+        from math import pow
         self.radius = the_radius
-
-
-     def diameter(self):
-         diameter = radius * 2
-         print (radius)
-         return radius
-
-
-     def area(self):
-         from math import pi
-         from math import pow
-         radi = radius(self)
-         area = pi * pow(radi,2)
-         print (area)
-         return area
+        self.diameter = the_radius * 2
+        self.area = pi * pow(the_radius,2)
 
