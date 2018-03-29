@@ -19,7 +19,8 @@ def test_def_circle_radius(radius = 5):
     Diameter should equal 10.
     Area should equal 78.54
     '''
-
+    circle_radius = MyCircle(5)
+    assert circle_radius.radius == 5
     return True
 
 

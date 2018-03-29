@@ -13,23 +13,22 @@ output:
 
 class MyCircle():
 
-        def radius(self):
-            radius = diameter / 2
-            print (diameter)
-            return diameter
+     def __init__(self, the_radius):
+        '''This is the radius of the circle'''
+        self.radius = the_radius
 
 
-        def diameter(self):
-            diameter = radius * 2
-            print (radius)
-            return radius
+     def diameter(self):
+         diameter = radius * 2
+         print (radius)
+         return radius
 
 
-        def area(self):
-            from math import pi
-            from math import pow
-            radi = radius(self)
-            area = pi * pow(radi,2)
-            print (area)
-            return area
+     def area(self):
+         from math import pi
+         from math import pow
+         radi = radius(self)
+         area = pi * pow(radi,2)
+         print (area)
+         return area
 
