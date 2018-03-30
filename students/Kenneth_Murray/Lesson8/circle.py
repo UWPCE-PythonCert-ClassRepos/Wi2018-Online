@@ -14,9 +14,11 @@ class MyCircle():
     def __init__(self, the_radius):
         self.radius = the_radius
 
+
     @property
     def diameter(self):
         return self.radius * 2
+
 
     @diameter.setter
     def diameter(self, val):
@@ -29,6 +31,12 @@ class MyCircle():
         from math import pow
         my_area = pi * pow(self.radius, 2)
         return my_area
+
+
+    @classmethod
+    def from_diameter(cls,val):
+        radius = val / 2
+        return cls(radius)
 
 
     def __repr__(self):

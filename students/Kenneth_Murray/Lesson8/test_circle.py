@@ -42,3 +42,14 @@ def test_def_circle_change_diameter(radius = 5):
     assert test_circle_diameter.diameter == 14
 
 
+def test_from_diameter(diameter = 10):
+    from circle import MyCircle
+    test_circle_diameter = MyCircle.from_diameter(10)
+    assert test_circle_diameter.radius == 5
+    assert test_circle_diameter.diameter == 10
+    assert test_circle_diameter.area == 78.53981633974483
+    test_circle_diameter.diameter = 14
+    assert test_circle_diameter.radius == 7
+    assert test_circle_diameter.diameter == 14
+
+
