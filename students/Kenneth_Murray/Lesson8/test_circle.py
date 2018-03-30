@@ -11,7 +11,7 @@ Test for the Circle class
 
 '''
 
-def test_def_circle_properties(radius = 5):
+def test_def_circle_properties():
     '''
     validates the circle attributes when a radius is used to define the circle
     5 is used as the radius value for the test.
@@ -27,7 +27,7 @@ def test_def_circle_properties(radius = 5):
     return True
 
 
-def test_def_circle_change_diameter(radius = 5):
+def test_def_circle_change_diameter():
     '''
     Validate that the radius or diameter can be changed after the circle has been defined and will affect a change on each other.
     This will test the properties.
@@ -42,7 +42,7 @@ def test_def_circle_change_diameter(radius = 5):
     assert test_circle_diameter.diameter == 14
 
 
-def test_from_diameter(diameter = 10):
+def test_from_diameter():
     from circle import MyCircle
     test_circle_diameter = MyCircle.from_diameter(10)
     assert test_circle_diameter.radius == 5
@@ -53,6 +53,16 @@ def test_from_diameter(diameter = 10):
     assert test_circle_diameter.diameter == 14
 
 
+def test_compare():
+    from circle import MyCircle
+    circ1 = MyCircle(5)
+    circ2 = MyCircle(10)
+    circ3 = MyCircle(15)
+    circ4 = MyCircle(50)
+    assert circ1 < circ2
+    assert circ2 > circ1
+    assert circ1 + circ2 == circ3
+    assert circ1 * circ2 == circ4
 
 
 

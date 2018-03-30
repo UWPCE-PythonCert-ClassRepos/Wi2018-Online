@@ -43,6 +43,26 @@ class MyCircle():
         return cls(radius)
 
 
+    def __add__(self, another_circle):
+        return MyCircle( self.radius + another_circle.radius)
+
+
+    def __lt__(self, another_circle):
+        return MyCircle( self.radius < another_circle.radius)
+
+
+    def __gt__(self, another_circle):
+        return MyCircle( self.radius > another_circle.radius)
+
+
+    def __eq__(self, another_circle):
+        return MyCircle( self.radius == another_circle.radius)
+
+
+    def __mul__(self, another_circle):
+        return MyCircle( self.radius * another_circle.radius)
+
+
     def __str__(self):
         return 'MyCircle has a radius of ({})'.format(self.radius)
 
