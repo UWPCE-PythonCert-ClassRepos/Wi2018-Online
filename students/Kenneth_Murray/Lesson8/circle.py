@@ -2,6 +2,10 @@
 '''The Circle Class
 inputs :
     the_radius
+
+methods:
+    .from diameter
+
 properties :
     diameter
     radius
@@ -38,6 +42,9 @@ class MyCircle():
         radius = val / 2
         return cls(radius)
 
+
+    def __str__(self):
+        return 'MyCircle has a radius of ({})'.format(self.radius)
 
     def __repr__(self):
         return 'MyCircle({})'.format(self.radius)
