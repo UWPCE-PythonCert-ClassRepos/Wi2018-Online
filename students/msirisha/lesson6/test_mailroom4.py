@@ -7,7 +7,7 @@ import sys
 
 class MailroomTest(unittest.TestCase):
 
-    def SetUp(self):
+    def setUp(self):
         mr.donor_data = {"sai emani": [20.23, 30.456, 50.786],
                       "sirisha marthy": [67.89, 45.89],
                       "ani emani": [12.789, 5.456],
