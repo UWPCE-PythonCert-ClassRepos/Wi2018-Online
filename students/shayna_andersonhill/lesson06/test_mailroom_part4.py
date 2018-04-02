@@ -16,12 +16,4 @@ def test_donation_numbers():
     assert average_donation['Lisa Rodriguez'] == 15   
     assert average_donation['Marge Simpson'] == 100
 
-    #def test_report_generation():
-    #    """Test that the report is complete and accurate."""
-
-
-def test_thank_you():
-    thank_you()
-
-
 
